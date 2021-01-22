@@ -1,6 +1,6 @@
 {
   "name": "hocus",
-  "description": "A time tracking command line tool",
+  "description": "The ultimate time tracking tool for coders and productivity nerds",
   "version": "0.1.0",
   "author": "Paul Kretschel @paulkre",
   "bin": {
