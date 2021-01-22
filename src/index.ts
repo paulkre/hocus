@@ -7,7 +7,7 @@ import { createLogCommand } from "./commands/log";
 
 export function run(argv: string[]) {
   new Command()
-    .version("v0.1.0")
+    .version("v1.0.0")
     .addCommand(createStartCommand())
     .addCommand(createStatusCommand())
     .addCommand(createStopCommand())
