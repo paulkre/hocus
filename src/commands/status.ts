@@ -1,11 +1,13 @@
-import { Command } from "commander";
+import { createCommand } from "../command";
 import { loadCurrentSession } from "../data/state";
 import { getRelativeTime, dateToDateTimeString } from "../utils";
 import * as style from "../style";
 
 export function createStatusCommand() {
-  return new Command("status")
-    .description("display the status of the current session")
+  return createCommand("status")
+    .description(
+      `Display the status of the current ${style.project("session")}`
+    )
     .action(async () => {
       const state = await loadCurrentSession();
 

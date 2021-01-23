@@ -1,4 +1,4 @@
-import { Command } from "commander";
+import { createCommand } from "../command";
 import { clearCurrentSession, loadCurrentSession } from "../data/state";
 import { storeSession } from "../data/session";
 import { getRelativeTime, logError } from "../utils";
@@ -36,7 +36,7 @@ export async function runStopAction() {
 }
 
 export function createStopCommand() {
-  return new Command("stop")
-    .description("stop the current session")
+  return createCommand("stop")
+    .description(`Stop the current ${style.project("session")}`)
     .action(runStopAction);
 }

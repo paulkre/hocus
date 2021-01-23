@@ -1,4 +1,4 @@
-import { Command } from "commander";
+import { createCommand } from "../command";
 import { loadSessions, Session } from "../data/session";
 import {
   dateToDayString,
@@ -23,28 +23,40 @@ type Options = {
 };
 
 export function createLogCommand() {
-  return new Command("log")
+  return createCommand("log")
     .option(
       "-f, --from <from>",
-      "the date from which the output should start including data"
+      `The ${style.date(
+        "date"
+      )} from which the output should start including data`
     )
     .option(
       "-t, --to <to>",
-      "the date to which the output should stop including data"
+      `The ${style.date("date")} at which the output should stop including data`
     )
     .option(
       "--first <first>",
-      "the number of sessions to include from the beginning of the selection"
+      `The number of ${style.project(
+        "sessions"
+      )} to include from the beginning of the selection`
     )
     .option(
       "--last <last>",
-      "the number of sessions to include from the beginning of the selection"
+      `The number of ${style.project(
+        "sessions"
+      )} to include from the beginning of the selection`
     )
     .option(
       "-T, --tags <tags...>",
-      "only sessions with the specified tags will be logged (you can use this option multiple times)"
+      `Only ${style.project("sessions")} with the specified ${style.tag(
+        "tags"
+      )} will be logged`
     )
-    .description("Display each recorded session in the given timespan")
+    .description(
+      `Display each recorded ${style.project(
+        "session"
+      )} in the given ${style.time("timespan")}`
+    )
     .action(async (opt: Options) => {
       let to: Date;
       let from: Date;

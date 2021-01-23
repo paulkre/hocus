@@ -1,4 +1,4 @@
-import { Command } from "commander";
+import { createCommand } from "./command";
 
 import { createStartCommand } from "./commands/start";
 import { createStatusCommand } from "./commands/status";
@@ -9,15 +9,15 @@ import { createEditCommand } from "./commands/edit";
 import pkg from "../package.json";
 
 export function run(argv: string[]) {
-  const program = new Command()
-    .version(`v${pkg.version}`, "-v, --version")
+  const program = createCommand()
+    .version(`v${pkg.version}`, "-v, --version", "Output the version number")
     .addCommand(createStartCommand())
     .addCommand(createStatusCommand())
     .addCommand(createStopCommand())
     .addCommand(createLogCommand())
     .addCommand(createEditCommand());
 
-  // console.log(program.commands.map((cmd) => cmd.));
+  program.addHelpCommand("help [command]", "Display help for command");
 
   program.parse(argv);
 }

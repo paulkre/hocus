@@ -1,4 +1,4 @@
-import { Command } from "commander";
+import { createCommand } from "../command";
 import { loadCurrentSession, storeCurrentSession } from "../data/state";
 import { dateToTimeString, parseTagsInput } from "../utils";
 import inquirer from "inquirer";
@@ -19,10 +19,15 @@ function humanizeTags(tags: string[]): string {
 }
 
 export function createStartCommand() {
-  return new Command("start")
+  return createCommand("start")
     .arguments("[project]")
-    .option("-t, --tags <tags...>", "tags to be used on the started session")
-    .description("start a new time tracking session")
+    .option(
+      "-t, --tags <tags...>",
+      `${style.tag("Tags")} to be used on the started ${style.project(
+        "session"
+      )}`
+    )
+    .description(`Start a new ${style.project("session")}`)
     .action(async (project: string | undefined, opt: Options) => {
       if (project) project = project.trim();
       const tags = opt.tags ? parseTagsInput(opt.tags) : [];
