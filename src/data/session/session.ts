@@ -3,7 +3,7 @@ export type Session = {
   start: Date;
   end: Date;
   project: string;
-  tags?: string[];
+  tags: string[];
   totalSeconds: number;
 };
 
@@ -12,7 +12,7 @@ export type SessionData = {
   start: number;
   end: number;
   project: string;
-  tags?: string[];
+  tags: string[];
 };
 
 function dateToString(date: Date) {

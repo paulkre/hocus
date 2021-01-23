@@ -1,36 +1,22 @@
 import { Command } from "commander";
 import { loadCurrentSession, storeCurrentSession } from "../data/state";
-import { dateToTimeString, logError } from "../utils";
+import { dateToTimeString, parseTagsInput } from "../utils";
 import chalk from "chalk";
 import inquirer from "inquirer";
 import { runStopAction } from "./stop";
 
-function parseProjectInput(input: string, tagInput: string[]) {
-  const trimmedInput = input.trim();
-  if (trimmedInput[0] === "+") {
-    tagInput.push(trimmedInput);
-    return undefined;
-  }
-  return trimmedInput;
-}
-
-function parseTagInput(tagInput: string[]): string[] {
-  const tags: string[] = [];
-  for (let tag of tagInput) {
-    tag = tag.trim();
-    if (tag[0] === "+") tags.push(tag.slice(1));
-  }
-  return tags;
-}
+type Options = {
+  tags?: string[];
+};
 
 export function createStartCommand() {
   return new Command("start")
     .arguments("[project]")
-    .arguments("[tags...]")
+    .option("-t, --tags <tags...>", "tags to be used on the started session")
     .description("Start tracking time for the given project.")
-    .action(async (project: string | undefined, tagInput: string[]) => {
-      if (project) project = parseProjectInput(project, tagInput);
-      const tags = parseTagInput(tagInput);
+    .action(async (project: string | undefined, opt: Options) => {
+      if (project) project = project.trim();
+      const tags = opt.tags ? parseTagsInput(opt.tags) : [];
 
       if (!project) {
         project = (

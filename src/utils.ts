@@ -50,3 +50,12 @@ export function parseNumberInput(value: string, name: string): number {
     throw `Number value for option ${chalk.bold(name)} is invalid.`;
   return n;
 }
+
+export function parseTagsInput(tagInput: string[]): string[] {
+  const tags: string[] = [];
+  for (let tag of tagInput) {
+    tag = tag.trim();
+    if (tag && !tags.includes(tag)) tags.push(tag);
+  }
+  return tags;
+}

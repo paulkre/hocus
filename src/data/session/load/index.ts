@@ -13,6 +13,7 @@ type Filter = {
   timespan?: Timespan;
   first?: number;
   last?: number;
+  tags?: string[];
 };
 
 function getDataFilenames() {
@@ -24,6 +25,13 @@ function getDataFilenames() {
     )
     .map((dirent) => dirent.name)
     .sort((a, b) => a.localeCompare(b));
+}
+
+function filterDataByTags(data: SessionData[], tags: string[]) {
+  return data.filter((session) => {
+    for (const tag of session.tags) if (tags.includes(tag)) return true;
+    return false;
+  });
 }
 
 async function loadDataOfFirstFew(
@@ -44,6 +52,7 @@ async function loadData({
   timespan,
   first,
   last,
+  tags,
 }: Filter): Promise<SessionData[]> {
   let filenames = getDataFilenames();
   if (!filenames.length) return [];
@@ -68,6 +77,7 @@ async function loadData({
 
   if (first) sessionData = sessionData.slice(0, first);
   if (last) sessionData = sessionData.slice(-last);
+  if (tags && tags.length) sessionData = filterDataByTags(sessionData, tags);
 
   return sessionData;
 }

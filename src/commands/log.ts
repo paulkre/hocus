@@ -8,6 +8,7 @@ import {
   logError,
   parseDateInput,
   parseNumberInput,
+  parseTagsInput,
 } from "../utils";
 import columnify from "columnify";
 
@@ -18,6 +19,7 @@ type Options = {
   to?: string;
   first?: string;
   last?: string;
+  tags?: string[];
 };
 
 export function createLogCommand() {
@@ -38,6 +40,10 @@ export function createLogCommand() {
       "--last <last>",
       "the number of sessions to include from the beginning of the selection"
     )
+    .option(
+      "-T, --tags <tags...>",
+      "only sessions with the specified tags will be logged (you can use this option multiple times)"
+    )
     .description("Display each recorded session in the given timespan")
     .action(async (opt: Options) => {
       let to: Date;
@@ -57,10 +63,13 @@ export function createLogCommand() {
         return;
       }
 
+      const tags = opt.tags ? parseTagsInput(opt.tags) : [];
+
       const sessions = await loadSessions({
         timespan: { from, to },
         first,
         last,
+        tags,
       });
 
       if (!sessions.length) {
@@ -104,7 +113,7 @@ export function createLogCommand() {
               to: dateToTimeString(session.end),
               duration: chalk.bold(durationToString(session.totalSeconds)),
               project: chalk.magenta.bold(session.project),
-              tags: session.tags
+              tags: session.tags.length
                 ? `[${session.tags
                     .map((tag) => chalk.blue.bold(tag))
                     .join(", ")}]`
