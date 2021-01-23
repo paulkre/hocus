@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.1.1] - 2021-01-24
+
+### Changed
+
+- Fix the previous release [1.1.0] which was not published correctly.
+
 ## [1.1.0] - 2021-01-24
 
 ### Added
