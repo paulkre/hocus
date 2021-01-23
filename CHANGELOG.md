@@ -4,7 +4,8 @@
 
 ### Added
 
-- Support for tags on sessions
+- Support tags in sessions
+- Support filtering by tags in log command
 
 ### Changed
 
