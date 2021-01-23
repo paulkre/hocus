@@ -6,6 +6,7 @@
 
 - Improvements of layout in `hocus log`
 - Data directory is now located at `~/.hocus/data` by default
+- Changes in the output of `hocus help`
 
 ## [1.2.0] - 2021-01-23
 
