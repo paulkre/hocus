@@ -1,9 +1,7 @@
 import { ago } from "time-ago";
 import { format as formatDate } from "date-and-time";
 import { parseDate as chronoParse } from "chrono-node";
-import chalk from "chalk";
-
-const styleDateString = (value: string) => chalk.cyan.bold(value);
+import * as style from "./style";
 
 export function durationToString(seconds: number) {
   const hours = Math.floor(seconds / 3600);
@@ -18,36 +16,36 @@ export function durationToString(seconds: number) {
 }
 
 export function getRelativeTime(date: Date) {
-  return chalk.green.bold(ago(date));
+  return style.time(ago(date));
 }
 
 export function dateToTimeString(date: Date) {
-  return chalk.green.bold(formatDate(date, "HH:mm"));
+  return style.time(formatDate(date, "HH:mm"));
 }
 
 export function dateToDateTimeString(date: Date) {
-  return styleDateString(formatDate(date, "YYYY-MM-DD HH:mm"));
+  return style.date(formatDate(date, "YYYY-MM-DD HH:mm"));
 }
 
 export function dateToDayString(date: Date) {
-  return styleDateString(formatDate(date, "dddd D MMMM YYYY"));
+  return style.date(formatDate(date, "dddd D MMMM YYYY"));
 }
 
 export function logError(message: string) {
-  console.log(chalk.red(message));
+  console.log(style.error(message));
 }
 
 export function parseDateInput(value: string, name: string): Date {
   const date = chronoParse(value);
   if (!date)
-    throw `Date / time value for option ${chalk.bold(name)} is invalid.`;
+    throw `Date / time value for option ${style.bold(name)} is invalid.`;
   return date;
 }
 
 export function parseNumberInput(value: string, name: string): number {
   const n = parseInt(value);
   if (Number.isNaN(n))
-    throw `Number value for option ${chalk.bold(name)} is invalid.`;
+    throw `Number value for option ${style.bold(name)} is invalid.`;
   return n;
 }
 

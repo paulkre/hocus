@@ -1,6 +1,5 @@
 import { Command } from "commander";
 import { loadSessions, Session } from "../data/session";
-import chalk from "chalk";
 import {
   dateToDayString,
   dateToTimeString,
@@ -11,6 +10,7 @@ import {
   parseTagsInput,
 } from "../utils";
 import columnify from "columnify";
+import * as style from "../style";
 
 const dateToDayNum = (date: Date) => Math.floor(date.getTime() / 86_400_000);
 
@@ -44,7 +44,7 @@ export function createLogCommand() {
       "-T, --tags <tags...>",
       "only sessions with the specified tags will be logged (you can use this option multiple times)"
     )
-    .description("display each recorded session in the given timespan")
+    .description("Display each recorded session in the given timespan")
     .action(async (opt: Options) => {
       let to: Date;
       let from: Date;
@@ -100,27 +100,25 @@ export function createLogCommand() {
         for (const { totalSeconds } of sessions)
           dayTotalSeconds += totalSeconds;
         console.log(
-          `${dateToDayString(day)} (${chalk.green.bold(
+          `${dateToDayString(day)} (${style.time(
             durationToString(dayTotalSeconds)
           )})`
         );
         console.log(
           columnify(
             sessions.map((session) => ({
-              id: chalk.grey.bold(session.id),
+              id: style.id(session.id),
               from: dateToTimeString(session.start),
               sep0: "to",
               to: dateToTimeString(session.end),
-              duration: chalk.bold(durationToString(session.totalSeconds)),
-              project: chalk.magenta.bold(
+              duration: style.bold(durationToString(session.totalSeconds)),
+              project: style.project(
                 session.project.length > 20
                   ? `${session.project.slice(0, 19)}…`
                   : session.project
               ),
               tags: session.tags.length
-                ? `[${session.tags
-                    .map((tag) => chalk.blue.bold(tag))
-                    .join(", ")}]`
+                ? `[${session.tags.map((tag) => style.tag(tag)).join(", ")}]`
                 : "",
             })),
             {
@@ -132,7 +130,7 @@ export function createLogCommand() {
                   align: "right",
                 },
                 duration: { align: "right" },
-                // project: { align: "right" },
+                project: { align: "right" },
               },
             }
           )

@@ -3,8 +3,8 @@ import { join } from "path";
 import { readFileSync, existsSync } from "fs";
 import { Ok, Err, Result } from "ts-results";
 import { logError } from "./utils";
-import chalk from "chalk";
 import isValidPath from "is-valid-path";
+import * as style from "./style";
 
 const homeDir = getHomeDir();
 
@@ -31,9 +31,9 @@ function error(message: string) {
 function valueIsPartialConfig(value: any): value is Partial<UserConfig> {
   if ("dataDirectory" in value && typeof value.dataDirectory !== "string") {
     error(
-      `Field ${chalk.bold("dataDirectory")} in config file ${chalk.bold(
+      `Field ${style.bold("dataDirectory")} in config file ${style.bold(
         configFilePath
-      )} is not of type ${chalk.bold("string")}.`
+      )} is not of type ${style.bold("string")}.`
     );
     return false;
   }
@@ -53,7 +53,7 @@ function sanitizeConfig({
 
   if (!isValidPath(appDirectory))
     return new Err(
-      `Field ${chalk.bold("dataDirectory")} in config file ${chalk.bold(
+      `Field ${style.bold("dataDirectory")} in config file ${style.bold(
         configFilePath
       )} does not contain a valid path.`
     );
@@ -77,7 +77,7 @@ function loadOrCreateConfig(): UserConfig {
       error(result.val);
     } catch {
       error(
-        `Config file ${chalk.bold(configFilePath)} has an incorrect format.`
+        `Config file ${style.bold(configFilePath)} has an incorrect format.`
       );
     }
   }

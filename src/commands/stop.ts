@@ -2,7 +2,7 @@ import { Command } from "commander";
 import { clearCurrentSession, loadCurrentSession } from "../data/state";
 import { storeSession } from "../data/session";
 import { getRelativeTime, logError } from "../utils";
-import chalk from "chalk";
+import * as style from "../style";
 
 export async function runStopAction() {
   const currentSession = await loadCurrentSession();
@@ -27,9 +27,9 @@ export async function runStopAction() {
   await clearCurrentSession();
   const date = new Date(1000 * currentSession.start);
   console.log(
-    `Stopping project ${chalk.magenta.bold(
+    `Stopping project ${style.project(
       currentSession.project
-    )} which was started ${getRelativeTime(date)}. ${chalk.grey.bold(
+    )} which was started ${getRelativeTime(date)}. ${style.id(
       `(ID: ${result.val.id})`
     )}`
   );

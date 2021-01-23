@@ -1,22 +1,21 @@
 import { Command } from "commander";
 import { loadCurrentSession, storeCurrentSession } from "../data/state";
 import { dateToTimeString, parseTagsInput } from "../utils";
-import chalk from "chalk";
 import inquirer from "inquirer";
 import { runStopAction } from "./stop";
+import * as style from "../style";
 
 type Options = {
   tags?: string[];
 };
 
-const styleTagName = (name: string) => chalk.blue.bold(name);
 function humanizeTags(tags: string[]): string {
   return tags.length > 1
     ? `${tags
         .slice(0, -1)
-        .map((tag) => styleTagName(tag))
-        .join(", ")} and ${styleTagName(tags[tags.length - 1])}`
-    : styleTagName(tags[0]);
+        .map((tag) => style.tag(tag))
+        .join(", ")} and ${style.tag(tags[tags.length - 1])}`
+    : style.tag(tags[0]);
 }
 
 export function createStartCommand() {
@@ -43,9 +42,7 @@ export function createStartCommand() {
       const currentSession = await loadCurrentSession();
       if (currentSession) {
         console.log(
-          `Project ${chalk.magenta.bold(
-            currentSession.project
-          )} already started.`
+          `Project ${style.project(currentSession.project)} already started.`
         );
         if (currentSession.project === project) return;
 
@@ -54,9 +51,9 @@ export function createStartCommand() {
             {
               name: "stopCurrent",
               type: "confirm",
-              message: `Do you want to stop ${chalk.magenta.bold(
+              message: `Do you want to stop ${style.project(
                 currentSession.project
-              )} and start ${chalk.magenta.bold(project)}?`,
+              )} and start ${style.project(project)}?`,
             },
           ]
         );
@@ -67,7 +64,7 @@ export function createStartCommand() {
 
       const date = new Date();
       console.log(
-        `Starting project ${chalk.magenta.bold(project)}${
+        `Starting project ${style.project(project)}${
           tags.length ? ` with tags ${humanizeTags(tags)}` : ""
         } at ${dateToTimeString(date)}.`
       );
