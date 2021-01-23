@@ -42,7 +42,9 @@ async function loadDataOfFirstFew(
   let data: SessionData[] = [];
   let i = 0;
   do {
-    const contents = await createFile<SessionData[]>(filenames[i]).load();
+    const contents = await createFile<SessionData[]>(
+      pathJoin(config.dataDirectory, filenames[i])
+    ).load();
     i++;
     if (contents) data = data.concat(contents);
   } while ((!data.length || data.length < first) && i < filenames.length);
