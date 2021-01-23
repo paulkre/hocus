@@ -39,7 +39,9 @@ export function createLogCommand() {
           (from && handleDateInput(from, "from")) ||
           new Date(toDate.getTime() - 604_800_000); // default is from 1 week ago
       } catch (name) {
-        logError(`Date / time value for option ${chalk.bold(name)} is invalid`);
+        logError(
+          `Date / time value for option ${chalk.bold(name)} is invalid.`
+        );
         return;
       }
 

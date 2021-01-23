@@ -24,7 +24,7 @@ export function createStartCommand() {
       console.log(
         `Starting project ${chalk.magenta.bold(project)} at ${dateToTimeString(
           date
-        )}`
+        )}.`
       );
     });
 }

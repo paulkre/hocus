@@ -10,7 +10,7 @@ export function createStatusCommand() {
       const state = await loadState();
 
       if (!state) {
-        console.log("No projects currently running.");
+        console.log("No project is currently being tracked.");
         return;
       }
 

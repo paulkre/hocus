@@ -11,7 +11,7 @@ export function createStopCommand() {
       const state = await loadState();
 
       if (!state) {
-        console.log("There are currently no projects started");
+        console.log("No project is currently being tracked.");
         return;
       }
 
@@ -31,7 +31,7 @@ export function createStopCommand() {
       console.log(
         `Stopping project ${chalk.magenta.bold(
           state.project
-        )} which was started ${getRelativeTime(date)} ${chalk.grey.bold(
+        )} which was started ${getRelativeTime(date)}. ${chalk.grey.bold(
           `(ID: ${result.val.id})`
         )}`
       );

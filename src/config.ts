@@ -20,7 +20,7 @@ const defaultConfig: Config = {
 
 function error(message: string) {
   logError(message);
-  console.log("Using default configuration");
+  console.log("Using default configuration.");
   console.log();
 }
 
@@ -29,7 +29,7 @@ function valueIsPartialConfig(value: any): value is Partial<Config> {
     error(
       `Field ${chalk.bold("dataDirectory")} in config file ${chalk.bold(
         configFilePath
-      )} is not of type ${chalk.bold("string")}`
+      )} is not of type ${chalk.bold("string")}.`
     );
     return false;
   }
@@ -49,7 +49,7 @@ function sanitizeConfig({ dataDirectory }: Config): Result<Config, string> {
     return new Err(
       `Field ${chalk.bold("dataDirectory")} in config file ${chalk.bold(
         configFilePath
-      )} does not contain a valid path`
+      )} does not contain a valid path.`
     );
 
   return new Ok({ dataDirectory });
@@ -71,7 +71,7 @@ function getOrCreateConfig(): Config {
       error(result.val);
     } catch {
       error(
-        `Config file ${chalk.bold(configFilePath)} has an incorrect format`
+        `Config file ${chalk.bold(configFilePath)} has an incorrect format.`
       );
     }
   }
