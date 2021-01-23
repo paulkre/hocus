@@ -15,3 +15,7 @@ or
 ```bash
 $ npm install --global hocus
 ```
+
+## Usage
+
+The command `hocus help` lists the available commands and `hocus help <command>` shows more details for an individual command.
