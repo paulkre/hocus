@@ -9,6 +9,16 @@ type Options = {
   tags?: string[];
 };
 
+const styleTagName = (name: string) => chalk.blue.bold(name);
+function humanizeTags(tags: string[]): string {
+  return tags.length > 1
+    ? `${tags
+        .slice(0, -1)
+        .map((tag) => styleTagName(tag))
+        .join(", ")} and ${styleTagName(tags[tags.length - 1])}`
+    : styleTagName(tags[0]);
+}
+
 export function createStartCommand() {
   return new Command("start")
     .arguments("[project]")
@@ -57,9 +67,9 @@ export function createStartCommand() {
 
       const date = new Date();
       console.log(
-        `Starting project ${chalk.magenta.bold(project)} at ${dateToTimeString(
-          date
-        )}.`
+        `Starting project ${chalk.magenta.bold(project)}${
+          tags.length ? ` with tags ${humanizeTags(tags)}` : ""
+        } at ${dateToTimeString(date)}.`
       );
       return storeCurrentSession({
         project,
