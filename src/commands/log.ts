@@ -1,5 +1,5 @@
 import { Command } from "commander";
-import { loadFrames, Frame } from "../data/frames";
+import { loadSessions, Session } from "../data/sessions";
 import chalk from "chalk";
 import {
   dateToDayString,
@@ -59,34 +59,39 @@ export function createLogCommand() {
         return;
       }
 
-      const frames = await loadFrames({ timespan: { from, to }, first, last });
+      const sessions = await loadSessions({
+        timespan: { from, to },
+        first,
+        last,
+      });
 
-      if (!frames.length) {
+      if (!sessions.length) {
         console.log("No data found.");
         return;
       }
 
-      const framesInDays = new Map<Date, Frame[]>();
+      const sessionsInDays = new Map<Date, Session[]>();
 
       let currentDayNum = 0;
-      let currentDayFrames: Frame[] = [];
-      frames.forEach((frame) => {
-        const dayNum = dateToDayNum(frame.start);
+      let currentDaySessions: Session[] = [];
+      sessions.forEach((session) => {
+        const dayNum = dateToDayNum(session.start);
         if (dayNum !== currentDayNum) {
-          currentDayFrames = [];
-          framesInDays.set(frame.start, currentDayFrames);
+          currentDaySessions = [];
+          sessionsInDays.set(session.start, currentDaySessions);
           currentDayNum = dayNum;
         }
-        currentDayFrames.push(frame);
+        currentDaySessions.push(session);
       });
 
-      const dayEntries = Array.from(framesInDays.entries()).sort(
+      const dayEntries = Array.from(sessionsInDays.entries()).sort(
         ([a], [b]) => b.getTime() - a.getTime()
       );
 
-      dayEntries.forEach(([day, frames], i) => {
+      dayEntries.forEach(([day, sessions], i) => {
         let dayTotalSeconds = 0;
-        for (const { totalSeconds } of frames) dayTotalSeconds += totalSeconds;
+        for (const { totalSeconds } of sessions)
+          dayTotalSeconds += totalSeconds;
         console.log(
           `${dateToDayString(day)} (${chalk.green.bold(
             durationToString(dayTotalSeconds)
@@ -94,7 +99,7 @@ export function createLogCommand() {
         );
         console.log(
           columnify(
-            frames.map((frame) => ({
+            sessions.map((frame) => ({
               id: chalk.grey.bold(frame.id),
               from: dateToTimeString(frame.start),
               sep0: "to",

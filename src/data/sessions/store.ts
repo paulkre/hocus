@@ -3,20 +3,20 @@ import { customAlphabet } from "nanoid";
 import { Ok, Err, Result } from "ts-results";
 import chalk from "chalk";
 import { createFile } from "../file";
-import { createFrame, Frame, FrameData } from "./frame";
-import { MAX_FRAME_DURATION } from ".";
+import { createSession, Session, SessionData } from "./session";
+import { SESSION_MAX_DURATION } from ".";
 
-type FrameDataBlueprint = Omit<FrameData, "localID">;
+type SessionDataBlueprint = Omit<SessionData, "localID">;
 
 const createRandomID = customAlphabet(
   "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ",
   4
 );
 
-function findOverlappingFrame(
-  blueprint: FrameDataBlueprint,
-  frames: FrameData[]
-): FrameData | null {
+function findCollidingSession(
+  blueprint: SessionDataBlueprint,
+  frames: SessionData[]
+): SessionData | null {
   for (const frame of frames) {
     if (
       (blueprint.start > frame.start && blueprint.start < frame.end) ||
@@ -27,45 +27,45 @@ function findOverlappingFrame(
   return null;
 }
 
-export async function recordFrame(
-  blueprint: FrameDataBlueprint
-): Promise<Result<Frame, string>> {
-  if (blueprint.end - blueprint.start > MAX_FRAME_DURATION)
+export async function storeSession(
+  blueprint: SessionDataBlueprint
+): Promise<Result<Session, string>> {
+  if (blueprint.end - blueprint.start > SESSION_MAX_DURATION)
     return new Err(
       `The new frame has a duration of over 4 weeks and thus cannot be recorded.
 Run ${chalk.bold("hocus cancel")} to stop the current session without saving.`
     );
 
-  const fileName = `${formatDate(
+  const filename = `${formatDate(
     new Date(1000 * blueprint.start),
     "YYYY-MM"
   )}.json`;
-  const file = createFile<FrameData[]>(fileName);
+  const file = createFile<SessionData[]>(filename);
 
-  const frames = (await file.load()) || [];
-  const blockingFrame = findOverlappingFrame(blueprint, frames);
-  if (blockingFrame)
+  const sessions = (await file.load()) || [];
+  const collidingSession = findCollidingSession(blueprint, sessions);
+  if (collidingSession)
     return new Err(
       `New frame overlaps with frame ${chalk.bold(
-        createFrame(blockingFrame).id
+        createSession(collidingSession).id
       )} and thus cannot be added`
     );
 
   let localID: string;
   do {
     localID = createRandomID();
-  } while (frames.find((frame) => frame.localID === localID));
+  } while (sessions.find((frame) => frame.localID === localID));
 
-  const frameData: FrameData = {
+  const sessionData: SessionData = {
     ...blueprint,
     localID,
   };
-  frames.push(frameData);
+  sessions.push(sessionData);
 
   file.store(
-    frames.sort((a, b) => a.start - b.start),
+    sessions.sort((a, b) => a.start - b.start),
     true
   );
 
-  return new Ok(createFrame(frameData));
+  return new Ok(createSession(sessionData));
 }

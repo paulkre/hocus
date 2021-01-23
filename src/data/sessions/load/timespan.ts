@@ -1,7 +1,7 @@
-import { FrameData } from "../frame";
-import { MAX_FRAME_DURATION } from "..";
+import { SessionData } from "../session";
+import { SESSION_MAX_DURATION } from "..";
 
-const maxFrameDurationMs = 1000 * MAX_FRAME_DURATION;
+const maxDurationMs = 1000 * SESSION_MAX_DURATION;
 
 export type Timespan = {
   from: Date;
@@ -16,8 +16,8 @@ export function filterFilenamesByTimespan(
   filenames: string[],
   { from: start, to: end }: Timespan
 ) {
-  const leftBoundDate = new Date(start.getTime() - maxFrameDurationMs);
-  const rightBoundDate = new Date(end.getTime() + maxFrameDurationMs);
+  const leftBoundDate = new Date(start.getTime() - maxDurationMs);
+  const rightBoundDate = new Date(end.getTime() + maxDurationMs);
 
   const leftBound = getDateValue(
     leftBoundDate.getFullYear(),
@@ -37,15 +37,15 @@ export function filterFilenamesByTimespan(
 }
 
 export function filterDataByTimespan(
-  contents: FrameData[],
+  contents: SessionData[],
   { from, to }: Timespan
 ) {
   const fromSeconds = Math.floor(from.getTime() / 1000);
   const toSeconds = Math.floor(to.getTime() / 1000);
 
   return contents.filter(
-    (frame) =>
-      (frame.start >= fromSeconds && frame.end <= toSeconds) ||
-      (frame.end >= fromSeconds && frame.end <= toSeconds)
+    (session) =>
+      (session.start >= fromSeconds && session.end <= toSeconds) ||
+      (session.end >= fromSeconds && session.end <= toSeconds)
   );
 }

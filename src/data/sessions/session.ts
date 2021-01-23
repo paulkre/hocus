@@ -1,4 +1,4 @@
-export type Frame = {
+export type Session = {
   id: string;
   start: Date;
   end: Date;
@@ -7,7 +7,7 @@ export type Frame = {
   totalSeconds: number;
 };
 
-export type FrameData = {
+export type SessionData = {
   localID: string;
   start: number;
   end: number;
@@ -20,13 +20,13 @@ function dateToString(date: Date) {
   return monthNum.toString(36).toUpperCase();
 }
 
-export function createFrame({
+export function createSession({
   localID,
   project,
   start: startSeconds,
   end: endSeconds,
   tags,
-}: FrameData): Frame {
+}: SessionData): Session {
   const start = new Date(1000 * startSeconds);
 
   return {

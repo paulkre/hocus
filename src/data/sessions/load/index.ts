@@ -1,5 +1,5 @@
 import { readdirSync } from "fs";
-import { createFrame, Frame, FrameData } from "../frame";
+import { createSession, Session, SessionData } from "../session";
 import { config } from "../../../config";
 import { createFile } from "../../file";
 
@@ -29,11 +29,11 @@ function getDataFilenames() {
 async function loadDataOfFirstFew(
   filenames: string[],
   first: number
-): Promise<FrameData[]> {
-  let data: FrameData[] = [];
+): Promise<SessionData[]> {
+  let data: SessionData[] = [];
   let i = 0;
   do {
-    const contents = await createFile<FrameData[]>(filenames[i]).load();
+    const contents = await createFile<SessionData[]>(filenames[i]).load();
     i++;
     if (contents) data = data.concat(contents);
   } while ((!data.length || data.length < first) && i < filenames.length);
@@ -44,7 +44,7 @@ async function loadData({
   timespan,
   first,
   last,
-}: Filter): Promise<FrameData[]> {
+}: Filter): Promise<SessionData[]> {
   let filenames = getDataFilenames();
   if (!filenames.length) return [];
 
@@ -56,22 +56,22 @@ async function loadData({
   if (timespan) filenames = filterFilenamesByTimespan(filenames, timespan);
 
   const fileContents = await Promise.all(
-    filenames.map((filename) => createFile<FrameData[]>(filename).load())
+    filenames.map((filename) => createFile<SessionData[]>(filename).load())
   );
 
-  let frameData: FrameData[] = [];
+  let sessionData: SessionData[] = [];
   fileContents.forEach((data) => {
-    if (data) frameData = frameData.concat(data);
+    if (data) sessionData = sessionData.concat(data);
   });
 
-  if (timespan) frameData = filterDataByTimespan(frameData, timespan);
+  if (timespan) sessionData = filterDataByTimespan(sessionData, timespan);
 
-  if (first) frameData = frameData.slice(0, first);
-  if (last) frameData = frameData.slice(-last);
+  if (first) sessionData = sessionData.slice(0, first);
+  if (last) sessionData = sessionData.slice(-last);
 
-  return frameData;
+  return sessionData;
 }
 
-export async function loadFrames(filter: Filter): Promise<Frame[]> {
-  return (await loadData(filter)).map((frame) => createFrame(frame));
+export async function loadSessions(filter: Filter): Promise<Session[]> {
+  return (await loadData(filter)).map((session) => createSession(session));
 }
