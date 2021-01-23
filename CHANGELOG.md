@@ -7,6 +7,10 @@
 - Default command for `hocus start`
 - Ability to log only the first or the last few sessions with the options `--first` and `--last`
 
+### Changed
+
+- The version number is now being retrieved from `package.json` instead of being hard coded.
+
 ## [1.0.0] - 2021-01-23
 
 ### Added
