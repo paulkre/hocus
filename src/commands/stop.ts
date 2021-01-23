@@ -1,22 +1,22 @@
 import { Command } from "commander";
-import { clearState, loadState } from "../data/state";
+import { clearCurrentSession, loadCurrentSession } from "../data/state";
 import { storeSession } from "../data/session";
 import { getRelativeTime, logError } from "../utils";
 import chalk from "chalk";
 
 export async function runStopAction() {
-  const state = await loadState();
+  const currentSession = await loadCurrentSession();
 
-  if (!state) {
+  if (!currentSession) {
     console.log("No project is currently being tracked.");
     return;
   }
 
   const result = await storeSession({
-    project: state.project,
-    start: state.start,
+    project: currentSession.project,
+    start: currentSession.start,
     end: Math.floor(Date.now() / 1000),
-    tags: state.tags,
+    tags: currentSession.tags,
   });
 
   if (result.err) {
@@ -24,11 +24,11 @@ export async function runStopAction() {
     return;
   }
 
-  clearState();
-  const date = new Date(1000 * state.start);
+  await clearCurrentSession();
+  const date = new Date(1000 * currentSession.start);
   console.log(
     `Stopping project ${chalk.magenta.bold(
-      state.project
+      currentSession.project
     )} which was started ${getRelativeTime(date)}. ${chalk.grey.bold(
       `(ID: ${result.val.id})`
     )}`

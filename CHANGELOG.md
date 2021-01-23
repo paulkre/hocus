@@ -6,6 +6,10 @@
 
 - Support for tags on sessions
 
+### Changed
+
+- Improved state handling
+
 ## [1.1.1] - 2021-01-23
 
 ### Changed

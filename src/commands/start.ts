@@ -1,5 +1,5 @@
 import { Command } from "commander";
-import { loadState, storeState } from "../data/state";
+import { loadCurrentSession, storeCurrentSession } from "../data/state";
 import { dateToTimeString, logError } from "../utils";
 import chalk from "chalk";
 import inquirer from "inquirer";
@@ -44,12 +44,14 @@ export function createStartCommand() {
         ).project;
       }
 
-      const state = await loadState();
-      if (state) {
+      const currentSession = await loadCurrentSession();
+      if (currentSession) {
         console.log(
-          `Project ${chalk.magenta.bold(state.project)} already started.`
+          `Project ${chalk.magenta.bold(
+            currentSession.project
+          )} already started.`
         );
-        if (state.project === project) return;
+        if (currentSession.project === project) return;
 
         const { stopCurrent } = await inquirer.prompt<{ stopCurrent: boolean }>(
           [
@@ -57,7 +59,7 @@ export function createStartCommand() {
               name: "stopCurrent",
               type: "confirm",
               message: `Do you want to stop ${chalk.magenta.bold(
-                state.project
+                currentSession.project
               )} and start ${chalk.magenta.bold(project)}?`,
             },
           ]
@@ -68,11 +70,15 @@ export function createStartCommand() {
       }
 
       const date = new Date();
-      storeState({ project, start: Math.floor(date.getTime() / 1000), tags });
       console.log(
         `Starting project ${chalk.magenta.bold(project)} at ${dateToTimeString(
           date
         )}.`
       );
+      return storeCurrentSession({
+        project,
+        start: Math.floor(date.getTime() / 1000),
+        tags,
+      });
     });
 }
