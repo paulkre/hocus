@@ -1,3 +1,4 @@
+import { join as pathJoin } from "path";
 import { format as formatDate } from "date-and-time";
 import { customAlphabet } from "nanoid";
 import { Ok, Err, Result } from "ts-results";
@@ -5,6 +6,7 @@ import chalk from "chalk";
 import { createFile } from "../file";
 import { createSession, Session, SessionData } from "./session";
 import { SESSION_MAX_DURATION } from ".";
+import { config } from "../../config";
 
 type SessionDataBlueprint = Omit<SessionData, "localID">;
 
@@ -40,7 +42,9 @@ Run ${chalk.bold("hocus cancel")} to stop the current session without saving.`
     new Date(1000 * blueprint.start),
     "YYYY-MM"
   )}.json`;
-  const file = createFile<SessionData[]>(filename);
+  const file = createFile<SessionData[]>(
+    pathJoin(config.dataDirectory, filename)
+  );
 
   const sessions = (await file.load()) || [];
   const collidingSession = findCollidingSession(blueprint, sessions);

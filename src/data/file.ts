@@ -1,4 +1,4 @@
-import { join as pathJoin } from "path";
+import { join as pathJoin, dirname } from "path";
 import {
   existsSync,
   readFile as nodeReadFile,
@@ -21,20 +21,19 @@ async function readFile(filePath: string): Promise<Buffer> {
   });
 }
 
-export function createFile<T>(fileName: string) {
-  const filePath = pathJoin(config.dataDirectory, fileName);
+export function createFile<T>(path: string) {
+  const directory = dirname(path);
 
   return {
-    filePath,
     async load(): Promise<T | null> {
-      if (existsSync(filePath)) {
-        const data = await readFile(filePath);
+      if (existsSync(path)) {
+        const data = await readFile(path);
         try {
           return JSON.parse(data.toString()) as T;
         } catch {
-          logError(`File ${chalk.bold(filePath)} seems to be corrupted`);
-          const backupPath = `${filePath}.bak`;
-          renameSync(filePath, backupPath);
+          logError(`File ${chalk.bold(path)} seems to be corrupted`);
+          const backupPath = `${path}.bak`;
+          renameSync(path, backupPath);
           console.log(
             `The corrupted file was moved to ${chalk.bold(
               backupPath
@@ -47,12 +46,12 @@ export function createFile<T>(fileName: string) {
       return null;
     },
     store(value: T, pretty?: boolean) {
-      if (!existsSync(config.dataDirectory)) mkdirp.sync(config.dataDirectory);
-      writeFileSync(filePath, JSON.stringify(value, null, pretty ? 1 : 0));
+      if (!existsSync(directory)) mkdirp.sync(directory);
+      writeFileSync(path, JSON.stringify(value, null, pretty ? 1 : 0));
     },
     storeArray() {},
     delete() {
-      unlinkSync(filePath);
+      unlinkSync(path);
     },
   };
 }

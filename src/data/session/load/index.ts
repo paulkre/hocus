@@ -1,3 +1,4 @@
+import { join as pathJoin } from "path";
 import { readdirSync } from "fs";
 import { createSession, Session, SessionData } from "../session";
 import { config } from "../../../config";
@@ -65,7 +66,9 @@ async function loadData({
   if (timespan) filenames = filterFilenamesByTimespan(filenames, timespan);
 
   const fileContents = await Promise.all(
-    filenames.map((filename) => createFile<SessionData[]>(filename).load())
+    filenames.map((filename) =>
+      createFile<SessionData[]>(pathJoin(config.dataDirectory, filename)).load()
+    )
   );
 
   let sessionData: SessionData[] = [];

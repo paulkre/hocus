@@ -10,12 +10,16 @@ const homeDir = getHomeDir();
 
 const configFilePath = join(homeDir, ".hocusrc");
 
-type Config = {
+type UserConfig = {
+  appDirectory: string;
+};
+
+type Config = UserConfig & {
   dataDirectory: string;
 };
 
-const defaultConfig: Config = {
-  dataDirectory: join(homeDir, ".hocus"),
+const defaultConfig: UserConfig = {
+  appDirectory: join(homeDir, ".hocus"),
 };
 
 function error(message: string) {
@@ -24,7 +28,7 @@ function error(message: string) {
   console.log();
 }
 
-function valueIsPartialConfig(value: any): value is Partial<Config> {
+function valueIsPartialConfig(value: any): value is Partial<UserConfig> {
   if ("dataDirectory" in value && typeof value.dataDirectory !== "string") {
     error(
       `Field ${chalk.bold("dataDirectory")} in config file ${chalk.bold(
@@ -42,20 +46,22 @@ function sanitizePath(path: string): string {
   return path.replace(/[\/\\]+$/, "");
 }
 
-function sanitizeConfig({ dataDirectory }: Config): Result<Config, string> {
-  dataDirectory = sanitizePath(dataDirectory);
+function sanitizeConfig({
+  appDirectory,
+}: UserConfig): Result<UserConfig, string> {
+  appDirectory = sanitizePath(appDirectory);
 
-  if (!isValidPath(dataDirectory))
+  if (!isValidPath(appDirectory))
     return new Err(
       `Field ${chalk.bold("dataDirectory")} in config file ${chalk.bold(
         configFilePath
       )} does not contain a valid path.`
     );
 
-  return new Ok({ dataDirectory });
+  return new Ok({ appDirectory });
 }
 
-function getOrCreateConfig(): Config {
+function loadOrCreateConfig(): UserConfig {
   if (existsSync(configFilePath)) {
     const data = readFileSync(configFilePath);
 
@@ -64,7 +70,7 @@ function getOrCreateConfig(): Config {
 
       if (!valueIsPartialConfig(value)) return defaultConfig;
 
-      const config: Config = { ...defaultConfig, ...value };
+      const config: UserConfig = { ...defaultConfig, ...value };
 
       const result = sanitizeConfig(config);
       if (result.ok) return result.val;
@@ -79,4 +85,9 @@ function getOrCreateConfig(): Config {
   return defaultConfig;
 }
 
-export const config = getOrCreateConfig();
+const userConfig = loadOrCreateConfig();
+
+export const config: Config = {
+  ...userConfig,
+  dataDirectory: join(userConfig.appDirectory, "data"),
+};

@@ -1,3 +1,5 @@
+import { join as pathJoin } from "path";
+import { config } from "../config";
 import { createFile } from "./file";
 import { SessionData } from "./session/session";
 
@@ -6,7 +8,7 @@ type State = {
   currentSession?: RunningSession | null;
 };
 
-const file = createFile<State>("state.json");
+const file = createFile<State>(pathJoin(config.appDirectory, "state.json"));
 
 export async function loadCurrentSession(): Promise<RunningSession | null> {
   const state = await file.load();
