@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- Support for tags on sessions
+
 ## [1.1.1] - 2021-01-23
 
 ### Changed

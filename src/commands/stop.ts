@@ -16,6 +16,7 @@ export async function runStopAction() {
     project: state.project,
     start: state.start,
     end: Math.floor(Date.now() / 1000),
+    tags: state.tags,
   });
 
   if (result.err) {

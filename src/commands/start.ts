@@ -1,15 +1,37 @@
 import { Command } from "commander";
 import { loadState, storeState } from "../data/state";
-import { dateToTimeString } from "../utils";
+import { dateToTimeString, logError } from "../utils";
 import chalk from "chalk";
 import inquirer from "inquirer";
 import { runStopAction } from "./stop";
 
+function parseProjectInput(input: string, tagInput: string[]) {
+  const trimmedInput = input.trim();
+  if (trimmedInput[0] === "+") {
+    tagInput.push(trimmedInput);
+    return undefined;
+  }
+  return trimmedInput;
+}
+
+function parseTagInput(tagInput: string[]): string[] {
+  const tags: string[] = [];
+  for (let tag of tagInput) {
+    tag = tag.trim();
+    if (tag[0] === "+") tags.push(tag.slice(1));
+  }
+  return tags;
+}
+
 export function createStartCommand() {
   return new Command("start")
     .arguments("[project]")
+    .arguments("[tags...]")
     .description("Start tracking time for the given project.")
-    .action(async (project?: string) => {
+    .action(async (project: string | undefined, tagInput: string[]) => {
+      if (project) project = parseProjectInput(project, tagInput);
+      const tags = parseTagInput(tagInput);
+
       if (!project) {
         project = (
           await inquirer.prompt<{ project: string }>([
@@ -46,7 +68,7 @@ export function createStartCommand() {
       }
 
       const date = new Date();
-      storeState({ project, start: Math.floor(date.getTime() / 1000) });
+      storeState({ project, start: Math.floor(date.getTime() / 1000), tags });
       console.log(
         `Starting project ${chalk.magenta.bold(project)} at ${dateToTimeString(
           date

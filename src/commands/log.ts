@@ -99,13 +99,18 @@ export function createLogCommand() {
         );
         console.log(
           columnify(
-            sessions.map((frame) => ({
-              id: chalk.grey.bold(frame.id),
-              from: dateToTimeString(frame.start),
+            sessions.map((session) => ({
+              id: chalk.grey.bold(session.id),
+              from: dateToTimeString(session.start),
               sep0: "to",
-              to: dateToTimeString(frame.end),
-              duration: chalk.bold(durationToString(frame.totalSeconds)),
-              project: chalk.magenta.bold(frame.project),
+              to: dateToTimeString(session.end),
+              duration: chalk.bold(durationToString(session.totalSeconds)),
+              project: chalk.magenta.bold(session.project),
+              tags: session.tags
+                ? `[${session.tags
+                    .map((tag) => chalk.blue.bold(tag))
+                    .join(", ")}]`
+                : "",
             })),
             {
               showHeaders: false,
