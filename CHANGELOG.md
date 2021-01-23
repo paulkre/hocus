@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 
-# Added
+### Added
 
 - Default command for `hocus start`
 - Ability to log only the first or the last few sessions with the options `--first` and `--last`
