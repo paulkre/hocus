@@ -62,7 +62,10 @@ Run ${chalk.bold("hocus cancel")} to stop the current session without saving.`
   };
   frames.push(frameData);
 
-  file.store(frames, true);
+  file.store(
+    frames.sort((a, b) => a.start - b.start),
+    true
+  );
 
   return new Ok(createFrame(frameData));
 }

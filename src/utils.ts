@@ -37,6 +37,16 @@ export function logError(message: string) {
   console.log(chalk.red(message));
 }
 
-export function parseDate(value: string): Date | null {
-  return chronoParse(value);
+export function parseDateInput(value: string, name: string): Date {
+  const date = chronoParse(value);
+  if (!date)
+    throw `Date / time value for option ${chalk.bold(name)} is invalid.`;
+  return date;
+}
+
+export function parseNumberInput(value: string, name: string): number {
+  const n = parseInt(value);
+  if (Number.isNaN(n))
+    throw `Number value for option ${chalk.bold(name)} is invalid.`;
+  return n;
 }
