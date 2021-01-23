@@ -1,14 +1,12 @@
-import { join as pathJoin, dirname } from "path";
+import { dirname } from "path";
 import {
   existsSync,
   readFile as nodeReadFile,
   writeFileSync,
   unlinkSync,
-  createWriteStream,
   renameSync,
 } from "fs";
 import mkdirp from "mkdirp";
-import { config } from "../config";
 import { logError } from "../utils";
 import chalk from "chalk";
 
