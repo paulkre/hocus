@@ -5,9 +5,11 @@ import { createStatusCommand } from "./commands/status";
 import { createStopCommand } from "./commands/stop";
 import { createLogCommand } from "./commands/log";
 
+import pkg from "../package.json";
+
 export function run(argv: string[]) {
   new Command()
-    .version("v1.0.0")
+    .version(`v${pkg.version}`)
     .addCommand(createStartCommand())
     .addCommand(createStatusCommand())
     .addCommand(createStopCommand())
