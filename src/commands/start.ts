@@ -23,7 +23,7 @@ export function createStartCommand() {
   return new Command("start")
     .arguments("[project]")
     .option("-t, --tags <tags...>", "tags to be used on the started session")
-    .description("Start tracking time for the given project.")
+    .description("start a new time tracking session")
     .action(async (project: string | undefined, opt: Options) => {
       if (project) project = project.trim();
       const tags = opt.tags ? parseTagsInput(opt.tags) : [];

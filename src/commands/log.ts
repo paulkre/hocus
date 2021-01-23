@@ -44,7 +44,7 @@ export function createLogCommand() {
       "-T, --tags <tags...>",
       "only sessions with the specified tags will be logged (you can use this option multiple times)"
     )
-    .description("Display each recorded session in the given timespan")
+    .description("display each recorded session in the given timespan")
     .action(async (opt: Options) => {
       let to: Date;
       let from: Date;

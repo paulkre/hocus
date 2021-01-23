@@ -5,7 +5,7 @@ import { getRelativeTime, dateToDateTimeString } from "../utils";
 
 export function createStatusCommand() {
   return new Command("status")
-    .description("Display the status of the current session")
+    .description("display the status of the current session")
     .action(async () => {
       const state = await loadCurrentSession();
 

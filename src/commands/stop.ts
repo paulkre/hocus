@@ -37,6 +37,6 @@ export async function runStopAction() {
 
 export function createStopCommand() {
   return new Command("stop")
-    .description("Stop the current tracking session.")
+    .description("stop the current session")
     .action(runStopAction);
 }
