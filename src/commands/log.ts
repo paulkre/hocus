@@ -112,7 +112,11 @@ export function createLogCommand() {
               sep0: "to",
               to: dateToTimeString(session.end),
               duration: chalk.bold(durationToString(session.totalSeconds)),
-              project: chalk.magenta.bold(session.project),
+              project: chalk.magenta.bold(
+                session.project.length > 20
+                  ? `${session.project.slice(0, 19)}…`
+                  : session.project
+              ),
               tags: session.tags.length
                 ? `[${session.tags
                     .map((tag) => chalk.blue.bold(tag))
@@ -128,7 +132,7 @@ export function createLogCommand() {
                   align: "right",
                 },
                 duration: { align: "right" },
-                project: { align: "right" },
+                // project: { align: "right" },
               },
             }
           )
