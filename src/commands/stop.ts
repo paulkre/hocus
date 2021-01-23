@@ -1,6 +1,6 @@
 import { Command } from "commander";
 import { clearState, loadState } from "../data/state";
-import { storeSession } from "../data/sessions";
+import { storeSession } from "../data/session";
 import { getRelativeTime, logError } from "../utils";
 import chalk from "chalk";
 

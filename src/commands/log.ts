@@ -1,5 +1,5 @@
 import { Command } from "commander";
-import { loadSessions, Session } from "../data/sessions";
+import { loadSessions, Session } from "../data/session";
 import chalk from "chalk";
 import {
   dateToDayString,
@@ -10,8 +10,6 @@ import {
   parseNumberInput,
 } from "../utils";
 import columnify from "columnify";
-
-function handleNumberInput(value: string) {}
 
 const dateToDayNum = (date: Date) => Math.floor(date.getTime() / 86_400_000);
 
