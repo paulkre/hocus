@@ -1,6 +1,6 @@
 import { createCommand } from "../command";
 import { clearCurrentSession, loadCurrentSession } from "../data/state";
-import { storeSession } from "../data/session";
+import { storeSession, createSession } from "../data/session";
 import { getRelativeTime, logError } from "../utils";
 import * as style from "../style";
 
@@ -12,13 +12,14 @@ export async function runStopAction() {
     return;
   }
 
-  const result = await storeSession({
+  const session = createSession({
     project: currentSession.project,
     start: currentSession.start,
     end: Math.floor(Date.now() / 1000),
     tags: currentSession.tags,
   });
 
+  const result = await storeSession(session);
   if (result.err) {
     logError(result.val);
     return;
@@ -30,7 +31,7 @@ export async function runStopAction() {
     `Stopping project ${style.project(
       currentSession.project
     )} which was started ${getRelativeTime(date)}. ${style.id(
-      `(ID: ${result.val.id})`
+      `(ID: ${session.id})`
     )}`
   );
 }

@@ -1,7 +1,7 @@
 import { join as pathJoin } from "path";
 import { config } from "../config";
 import { createFile } from "./file";
-import { SessionData } from "./session/session";
+import { SessionData } from "./session";
 
 type RunningSession = Omit<SessionData, "localID" | "end">;
 type State = {

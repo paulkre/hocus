@@ -1,6 +1,35 @@
+export const SESSION_START_YEAR = 1900;
 export const SESSION_MAX_DURATION = 2_419_200; // in seconds
+
+export type SessionData = Readonly<{
+  localID: string;
+  start: number;
+  end: number;
+  project: string;
+  tags?: string[];
+}>;
+
+export type Session = Readonly<{
+  id: string;
+  start: Date;
+  end: Date;
+  project: string;
+  tags: string[];
+  totalSeconds: number;
+  data: SessionData;
+}>;
 
 export * from "./store";
 export * from "./load";
+export * from "./creation";
 
-export type { Session } from "./session";
+export function sessionsAreEqual(a: Session, b: Session): boolean {
+  return (
+    a.id === b.id &&
+    a.project === b.project &&
+    a.data.start === b.data.start &&
+    a.data.end === b.data.end &&
+    a.tags.length === b.tags.length &&
+    a.tags.every((tag, i) => tag === b.tags[i])
+  );
+}

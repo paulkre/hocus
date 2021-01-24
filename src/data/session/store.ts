@@ -1,75 +1,80 @@
 import { join as pathJoin } from "path";
 import { format as formatDate } from "date-and-time";
-import { customAlphabet } from "nanoid";
 import { Ok, Err, Result } from "ts-results";
 import chalk from "chalk";
+import { SESSION_MAX_DURATION, Session, SessionData } from ".";
 import { createFile } from "../file";
-import { createSession, Session, SessionData } from "./session";
-import { SESSION_MAX_DURATION } from ".";
 import { config } from "../../config";
+import { loadSessions } from "./load";
 
-type SessionDataBlueprint = Omit<SessionData, "localID">;
+async function findCollidingSession(
+  newSession: Session
+): Promise<Session | null> {
+  const sessions = await loadSessions({
+    timespan: {
+      from: newSession.start,
+      to: newSession.end,
+    },
+  });
 
-const createRandomID = customAlphabet(
-  "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-  4
-);
-
-function findCollidingSession(
-  blueprint: SessionDataBlueprint,
-  frames: SessionData[]
-): SessionData | null {
-  for (const frame of frames) {
+  const {
+    id,
+    data: { start, end },
+  } = newSession;
+  for (const session of sessions) {
+    const {
+      id: otherID,
+      data: { start: otherStart, end: otherEnd },
+    } = session;
     if (
-      (blueprint.start > frame.start && blueprint.start < frame.end) ||
-      (blueprint.end > frame.start && blueprint.end < frame.end)
+      id !== otherID &&
+      ((start > otherStart && start < otherEnd) ||
+        (end > otherStart && end < otherEnd) ||
+        (otherStart > start && otherStart < end) ||
+        (otherEnd > start && otherEnd < end))
     )
-      return frame;
+      return session;
   }
+
   return null;
 }
 
 export async function storeSession(
-  blueprint: SessionDataBlueprint
-): Promise<Result<Session, string>> {
-  if (blueprint.end - blueprint.start > SESSION_MAX_DURATION)
+  session: Session
+): Promise<Result<number, string>> {
+  const { data } = session;
+
+  if (data.end - data.start > SESSION_MAX_DURATION)
     return new Err(
-      `The new frame has a duration of over 4 weeks and thus cannot be recorded.
+      `The new session has a duration of over 4 weeks and thus cannot be saved.
 Run ${chalk.bold("hocus cancel")} to stop the current session without saving.`
     );
 
-  const filename = `${formatDate(
-    new Date(1000 * blueprint.start),
-    "YYYY-MM"
-  )}.json`;
+  const filename = `${formatDate(new Date(1000 * data.start), "YYYY-MM")}.json`;
   const file = createFile<SessionData[]>(
     pathJoin(config.dataDirectory, filename)
   );
 
   const sessions = (await file.load()) || [];
-  const collidingSession = findCollidingSession(blueprint, sessions);
+  const collidingSession = await findCollidingSession(session);
   if (collidingSession)
     return new Err(
-      `New frame overlaps with frame ${chalk.bold(
-        createSession(collidingSession).id
-      )} and thus cannot be added`
+      `The session could not be saved / updated because at least one other session (${chalk.bold(
+        collidingSession.id
+      )}) already exists during the same time.`
     );
 
-  let localID: string;
-  do {
-    localID = createRandomID();
-  } while (sessions.find((frame) => frame.localID === localID));
+  const foundIndex = sessions.findIndex(
+    (session) => session.localID === data.localID
+  );
+  if (foundIndex >= 0) sessions.splice(foundIndex, 1);
 
-  const sessionData: SessionData = {
-    ...blueprint,
-    localID,
-  };
-  sessions.push(sessionData);
+  sessions.push(data);
 
   file.store(
     sessions.sort((a, b) => a.start - b.start),
     true
   );
 
-  return new Ok(createSession(sessionData));
+  return new Ok(sessions.length);
 }

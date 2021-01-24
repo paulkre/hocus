@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Support for editing sessions with `hocus edit [id]`
+
 ### Changed
 
 - Improvements of layout in `hocus log`

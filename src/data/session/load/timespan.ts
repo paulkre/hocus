@@ -1,5 +1,4 @@
-import { SessionData } from "../session";
-import { SESSION_MAX_DURATION } from "..";
+import { SESSION_MAX_DURATION, SessionData } from "..";
 
 const maxDurationMs = 1000 * SESSION_MAX_DURATION;
 

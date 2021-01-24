@@ -1,6 +1,7 @@
 import { join as pathJoin } from "path";
 import { readdirSync } from "fs";
-import { createSession, Session, SessionData } from "../session";
+import { Session, SessionData } from "..";
+import { restoreSession } from "../creation";
 import { config } from "../../../config";
 import { createFile } from "../../file";
 
@@ -9,6 +10,8 @@ import {
   filterDataByTimespan,
   Timespan,
 } from "./timespan";
+
+export * from "./single";
 
 type Filter = {
   timespan?: Timespan;
@@ -30,6 +33,7 @@ function getDataFilenames() {
 
 function filterDataByTags(data: SessionData[], tags: string[]) {
   return data.filter((session) => {
+    if (!session.tags) return false;
     for (const tag of session.tags) if (tags.includes(tag)) return true;
     return false;
   });
@@ -88,5 +92,5 @@ async function loadData({
 }
 
 export async function loadSessions(filter: Filter): Promise<Session[]> {
-  return (await loadData(filter)).map((session) => createSession(session));
+  return (await loadData(filter)).map((session) => restoreSession(session));
 }

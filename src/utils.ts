@@ -32,7 +32,7 @@ export function dateToDayString(date: Date) {
 }
 
 export function logError(message: string) {
-  console.log(style.error(message));
+  console.log(`Error: ${style.error(message)}`);
 }
 
 export function parseDateInput(value: string, name: string): Date {
@@ -49,11 +49,22 @@ export function parseNumberInput(value: string, name: string): number {
   return n;
 }
 
-export function parseTagsInput(tagInput: string[]): string[] {
+export function parseTagsInput(input: string[]): string[] {
   const tags: string[] = [];
-  for (let tag of tagInput) {
-    tag = tag.trim();
-    if (tag && !tags.includes(tag)) tags.push(tag);
-  }
-  return tags;
+  input.forEach((tagString) => {
+    tagString.split(",").forEach((tag) => {
+      tag = tag.replace(/[^A-Za-z0-9-\.]+/, "").trim();
+      if (tag && !tags.includes(tag)) tags.push(tag);
+    });
+  });
+  return tags.sort((a, b) => a.localeCompare(b));
+}
+
+export function humanizeTags(tags: string[]): string {
+  return tags.length > 1
+    ? `${tags
+        .slice(0, -1)
+        .map((tag) => style.tag(tag))
+        .join(", ")} and ${style.tag(tags[tags.length - 1])}`
+    : style.tag(tags[0]);
 }

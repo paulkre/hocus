@@ -1,6 +1,6 @@
 import { createCommand } from "../command";
 import { loadCurrentSession, storeCurrentSession } from "../data/state";
-import { dateToTimeString, parseTagsInput } from "../utils";
+import { dateToTimeString, parseTagsInput, humanizeTags } from "../utils";
 import inquirer from "inquirer";
 import { runStopAction } from "./stop";
 import * as style from "../style";
@@ -8,15 +8,6 @@ import * as style from "../style";
 type Options = {
   tags?: string[];
 };
-
-function humanizeTags(tags: string[]): string {
-  return tags.length > 1
-    ? `${tags
-        .slice(0, -1)
-        .map((tag) => style.tag(tag))
-        .join(", ")} and ${style.tag(tags[tags.length - 1])}`
-    : style.tag(tags[0]);
-}
 
 export function createStartCommand() {
   return createCommand("start")
