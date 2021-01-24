@@ -68,3 +68,7 @@ export function humanizeTags(tags: string[]): string {
         .join(", ")} and ${style.tag(tags[tags.length - 1])}`
     : style.tag(tags[0]);
 }
+
+export function dateToInputDefault(date: Date) {
+  return formatDate(date, "YYYY-MM-DD HH:mm:ss");
+}
