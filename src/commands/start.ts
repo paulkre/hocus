@@ -16,7 +16,7 @@ export function createStartCommand() {
       "-t, --tags <tags...>",
       `${style.tag("Tags")} to be used on the started ${style.project(
         "session"
-      )}`
+      )} (comma or space separated)`
     )
     .description(`Start a new ${style.project("session")}`)
     .action(async (project: string | undefined, opt: Options) => {

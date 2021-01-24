@@ -77,8 +77,8 @@ export function createEditCommand() {
     )
     .action(async (id: string | undefined, cmdOptions: Partial<Options>) => {
       const flagsExist = Object.keys(cmdOptions).length > 0;
-      if (!flagsExist && !id) {
-        logError("Flags are only allowed if a session ID is provided.");
+      if (flagsExist && !id) {
+        logError("Flags are only permitted if a session ID is provided.");
         return;
       }
 

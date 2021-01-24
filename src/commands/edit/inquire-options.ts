@@ -5,22 +5,22 @@ export async function inquireOptions(defaults: Options): Promise<Options> {
   const input = await prompt<Options>([
     {
       name: "project",
-      message: "What do you want to call the project",
+      message: "Project",
       default: defaults.project,
     },
     {
       name: "start",
-      message: "When should the session start?",
+      message: "Start Date",
       default: defaults.start,
     },
     {
       name: "end",
-      message: "When should the session end?",
+      message: "End Date",
       default: defaults.end,
     },
     {
       name: "tags",
-      message: "Which tags should the session use?",
+      message: "Tags",
       default: defaults.tags,
     },
   ]);
