@@ -1,15 +1,15 @@
 export const SESSION_START_YEAR = 1900;
 export const SESSION_MAX_DURATION = 2_419_200; // in seconds
 
-export type SessionData = Readonly<{
+export type SessionData = {
   localID: string;
   start: number;
   end: number;
   project: string;
   tags?: string[];
-}>;
+};
 
-export type Session = Readonly<{
+export type Session = {
   id: string;
   start: Date;
   end: Date;
@@ -17,7 +17,9 @@ export type Session = Readonly<{
   tags: string[];
   totalSeconds: number;
   data: SessionData;
-}>;
+};
+
+export type SessionBlueprint = Omit<SessionData, "localID">;
 
 export * from "./store";
 export * from "./load";

@@ -1,7 +1,5 @@
 import { customAlphabet } from "nanoid";
-import { SESSION_START_YEAR, SessionData, Session } from ".";
-
-type SessionBlueprint = Omit<SessionData, "localID">;
+import { SESSION_START_YEAR, SessionData, Session, SessionBlueprint } from ".";
 
 function dateToID(date: Date) {
   const monthNum =

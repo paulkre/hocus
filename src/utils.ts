@@ -1,6 +1,5 @@
 import { ago } from "time-ago";
 import { format as formatDate } from "date-and-time";
-import { parseDate as chronoParse } from "chrono-node";
 import * as style from "./style";
 
 export function durationToString(seconds: number) {
@@ -33,31 +32,6 @@ export function dateToDayString(date: Date) {
 
 export function logError(message: string) {
   console.log(`Error: ${style.error(message)}`);
-}
-
-export function parseDateInput(value: string, name: string): Date {
-  const date = chronoParse(value);
-  if (!date)
-    throw `Date / time value for option ${style.bold(name)} is invalid.`;
-  return date;
-}
-
-export function parseNumberInput(value: string, name: string): number {
-  const n = parseInt(value);
-  if (Number.isNaN(n))
-    throw `Number value for option ${style.bold(name)} is invalid.`;
-  return n;
-}
-
-export function parseTagsInput(input: string[]): string[] {
-  const tags: string[] = [];
-  input.forEach((tagString) => {
-    tagString.split(",").forEach((tag) => {
-      tag = tag.replace(/[^A-Za-z0-9-\.]+/, "").trim();
-      if (tag && !tags.includes(tag)) tags.push(tag);
-    });
-  });
-  return tags.sort((a, b) => a.localeCompare(b));
 }
 
 export function humanizeTags(tags: string[]): string {

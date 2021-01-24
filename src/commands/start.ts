@@ -1,6 +1,7 @@
 import { createCommand } from "../command";
 import { loadCurrentSession, storeCurrentSession } from "../data/state";
-import { dateToTimeString, parseTagsInput, humanizeTags } from "../utils";
+import { dateToTimeString, humanizeTags } from "../utils";
+import { parseTags } from "../parsing";
 import inquirer from "inquirer";
 import { runStopAction } from "./stop";
 import * as style from "../style";
@@ -21,7 +22,7 @@ export function createStartCommand() {
     .description(`Start a new ${style.project("session")}`)
     .action(async (project: string | undefined, opt: Options) => {
       if (project) project = project.trim();
-      const tags = opt.tags ? parseTagsInput(opt.tags) : [];
+      const tags = opt.tags ? parseTags(opt.tags) : [];
 
       if (!project) {
         project = (

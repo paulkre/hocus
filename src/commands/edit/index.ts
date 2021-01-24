@@ -1,7 +1,6 @@
 import { Err, Ok, Result } from "ts-results";
 import { createCommand } from "../../command";
 import {
-  loadSessions,
   loadSingleSession,
   restoreSession,
   sessionsAreEqual,
@@ -14,47 +13,12 @@ import {
   dateToTimeString,
   logError,
   humanizeTags,
-  parseDateInput,
-  parseTagsInput,
   dateToInputDefault,
 } from "../../utils";
 import { displayChanges } from "./display-changes";
-import { inquireOptions } from "./inquire-options";
+import { inquireSessionData } from "./inquire-session-data";
 import { inquireSession } from "./inquire-session";
-
-async function loadLastSessionID() {
-  const result = await loadSessions({ last: 1 });
-  return result.length ? result[0].id : null;
-}
-
-export type Options = {
-  project: string;
-  start: string;
-  end: string;
-  tags: string;
-};
-
-function parseOptions(
-  input: Options,
-  { data: { localID } }: Session
-): Result<Session, string> {
-  const start = Math.floor(
-    parseDateInput(input.start, "start").getTime() / 1000
-  );
-  const end = Math.floor(parseDateInput(input.end, "end").getTime() / 1000);
-
-  if (start > end) return new Err("Session cannot end before it starts.");
-
-  return new Ok(
-    restoreSession({
-      localID,
-      project: input.project,
-      start,
-      end,
-      tags: parseTagsInput(input.tags.split(" ")),
-    })
-  );
-}
+import { parseSessionData, SessionDataInput } from "../../parsing/session-data";
 
 async function resolveSession(id: string): Promise<Result<Session, string>> {
   const session = await loadSingleSession(id);
@@ -81,73 +45,79 @@ export function createEditCommand() {
         "session"
       )} with the given ${style.bold("ID")}`
     )
-    .action(async (id: string | undefined, cmdOptions: Partial<Options>) => {
-      const flagsExist = Object.keys(cmdOptions).length > 0;
-      if (flagsExist && !id) {
-        logError("Flags are only permitted if a session ID is provided.");
-        return;
+    .action(
+      async (id: string | undefined, cmdOptions: Partial<SessionDataInput>) => {
+        const flagsExist = Object.keys(cmdOptions).length > 0;
+        if (flagsExist && !id) {
+          logError("Flags are only permitted if a session ID is provided.");
+          return;
+        }
+
+        const sessionResult = await (id
+          ? resolveSession(id)
+          : inquireSession());
+
+        if (sessionResult.err) {
+          logError(sessionResult.val);
+          return;
+        }
+
+        const session = sessionResult.val;
+
+        console.log(`Editing session ${style.bold(session.id)}:`);
+        console.log(
+          `Recorded for project ${style.project(
+            session.project
+          )} on ${style.date(dateToDayString(session.start))} from ${style.time(
+            dateToTimeString(session.start)
+          )} to ${style.time(dateToTimeString(session.end))}${
+            session.tags.length
+              ? ` with tag${session.tags.length > 1 ? "s" : ""} ${humanizeTags(
+                  session.tags
+                )}`
+              : ""
+          }.`
+        );
+        console.log();
+
+        const defaultOptions: SessionDataInput = {
+          project: session.project,
+          start: dateToInputDefault(session.start),
+          end: dateToInputDefault(session.end),
+          tags: session.tags,
+        };
+
+        const sessionDataParseResult = parseSessionData(
+          flagsExist
+            ? {
+                ...defaultOptions,
+                ...cmdOptions,
+              }
+            : await inquireSessionData(defaultOptions)
+        );
+
+        if (sessionDataParseResult.err) {
+          logError(sessionDataParseResult.val);
+          return;
+        }
+
+        const editedSession = restoreSession({
+          ...sessionDataParseResult.val,
+          localID: session.data.localID,
+        });
+
+        if (sessionsAreEqual(session, editedSession)) {
+          console.log("No changes were made.");
+          return;
+        }
+
+        const storeResult = await storeSession(editedSession);
+        if (storeResult.err) {
+          logError(storeResult.val);
+          return;
+        }
+
+        displayChanges(session, editedSession);
       }
-
-      const sessionResult = await (id ? resolveSession(id) : inquireSession());
-
-      if (sessionResult.err) {
-        logError(sessionResult.val);
-        return;
-      }
-
-      const session = sessionResult.val;
-
-      console.log(`Editing session ${style.bold(session.id)}:`);
-      console.log(
-        `Recorded for project ${style.project(session.project)} on ${style.date(
-          dateToDayString(session.start)
-        )} from ${style.time(dateToTimeString(session.start))} to ${style.time(
-          dateToTimeString(session.end)
-        )}${
-          session.tags.length
-            ? ` with tag${session.tags.length > 1 ? "s" : ""} ${humanizeTags(
-                session.tags
-              )}`
-            : ""
-        }.`
-      );
-      console.log();
-
-      const defaultOptions: Options = {
-        project: session.project,
-        start: dateToInputDefault(session.start),
-        end: dateToInputDefault(session.end),
-        tags: session.tags ? session.tags.join(", ") : "",
-      };
-
-      const parseResult = flagsExist
-        ? parseOptions(
-            {
-              ...defaultOptions,
-              ...cmdOptions,
-            },
-            session
-          )
-        : parseOptions(await inquireOptions(defaultOptions), session);
-
-      if (parseResult.err) {
-        logError(parseResult.val);
-        return;
-      }
-
-      const editedSession = parseResult.val;
-
-      if (sessionsAreEqual(session, editedSession)) {
-        console.log("No changes were made.");
-        return;
-      }
-
-      const storeResult = await storeSession(editedSession);
-      if (storeResult.err) {
-        logError(storeResult.val);
-        return;
-      }
-
-      displayChanges(session, editedSession);
-    });
+    );
 }

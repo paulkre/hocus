@@ -1,8 +1,10 @@
 import { prompt } from "inquirer";
-import { Options } from ".";
+import { SessionDataInput } from "../../parsing/session-data";
 
-export async function inquireOptions(defaults: Options): Promise<Options> {
-  const input = await prompt<Options>([
+export async function inquireSessionData(
+  defaults: SessionDataInput
+): Promise<SessionDataInput> {
+  const input = await prompt<SessionDataInput>([
     {
       name: "project",
       message: "Project",

@@ -13,7 +13,7 @@ import {
 
 export * from "./single";
 
-type Filter = {
+export type Filter = {
   timespan?: Timespan;
   first?: number;
   last?: number;

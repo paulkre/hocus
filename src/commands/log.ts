@@ -5,10 +5,8 @@ import {
   dateToTimeString,
   durationToString,
   logError,
-  parseDateInput,
-  parseNumberInput,
-  parseTagsInput,
 } from "../utils";
+import { parseFilter } from "../parsing/filter";
 import columnify from "columnify";
 import * as style from "../style";
 
@@ -57,32 +55,14 @@ export function createLogCommand() {
         "session"
       )} in the given ${style.time("timespan")}`
     )
-    .action(async (opt: Options) => {
-      let to: Date;
-      let from: Date;
-      let first: number | undefined;
-      let last: number | undefined;
-
-      try {
-        to = (opt.to && parseDateInput(opt.to, "to")) || new Date();
-        from =
-          (opt.from && parseDateInput(opt.from, "from")) ||
-          new Date(to.getTime() - 604_800_000); // default is from 1 week ago
-        if (opt.first) first = Math.floor(parseNumberInput(opt.first, "first"));
-        if (opt.last) last = Math.floor(parseNumberInput(opt.last, "last"));
-      } catch (message) {
-        logError(message);
+    .action(async (options: Options) => {
+      const filterParseResult = parseFilter(options);
+      if (filterParseResult.err) {
+        logError(filterParseResult.val);
         return;
       }
 
-      const tags = opt.tags ? parseTagsInput(opt.tags) : [];
-
-      const sessions = await loadSessions({
-        timespan: { from, to },
-        first,
-        last,
-        tags,
-      });
+      const sessions = await loadSessions(filterParseResult.val);
 
       if (!sessions.length) {
         console.log("No data found.");
