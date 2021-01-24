@@ -62,7 +62,7 @@ export function createStartCommand() {
       console.log(
         `Starting project ${style.project(project)}${
           tags.length ? ` with tags ${humanizeTags(tags)}` : ""
-        } at ${dateToTimeString(date)}.`
+        } at ${style.time(dateToTimeString(date))}.`
       );
       return storeCurrentSession({
         project,

@@ -112,7 +112,7 @@ export function createLogCommand() {
         for (const { totalSeconds } of sessions)
           dayTotalSeconds += totalSeconds;
         console.log(
-          `${dateToDayString(day)} (${style.time(
+          `${style.date(dateToDayString(day))} (${style.time(
             durationToString(dayTotalSeconds)
           )})`
         );
@@ -120,9 +120,9 @@ export function createLogCommand() {
           columnify(
             sessions.map((session) => ({
               id: style.id(session.id),
-              from: dateToTimeString(session.start),
+              from: style.time(dateToTimeString(session.start)),
               sep0: "to",
-              to: dateToTimeString(session.end),
+              to: style.time(dateToTimeString(session.end)),
               duration: style.bold(durationToString(session.totalSeconds)),
               project: style.project(
                 session.project.length > 20

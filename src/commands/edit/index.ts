@@ -1,6 +1,4 @@
-import { format as formatDate } from "date-and-time";
 import { Err, Ok, Result } from "ts-results";
-import { prompt } from "inquirer";
 import { createCommand } from "../../command";
 import {
   loadSessions,
@@ -22,6 +20,7 @@ import {
 } from "../../utils";
 import { displayChanges } from "./display-changes";
 import { inquireOptions } from "./inquire-options";
+import { inquireSession } from "./inquire-session";
 
 async function loadLastSessionID() {
   const result = await loadSessions({ last: 1 });
@@ -57,6 +56,13 @@ function parseOptions(
   );
 }
 
+async function resolveSession(id: string): Promise<Result<Session, string>> {
+  const session = await loadSingleSession(id);
+  return session
+    ? new Ok(session)
+    : new Err(`Session with ID ${style.bold(id)} could not be found.`);
+}
+
 export function createEditCommand() {
   return createCommand("edit")
     .arguments("[id]")
@@ -82,35 +88,22 @@ export function createEditCommand() {
         return;
       }
 
-      if (!id) {
-        const lastID = await loadLastSessionID();
+      const sessionResult = await (id ? resolveSession(id) : inquireSession());
 
-        id = (
-          await prompt<{ id: string }>([
-            {
-              name: "id",
-              message: `Which session (${style.bold(
-                "ID"
-              )}) do you want to edit?`,
-              default: lastID,
-            },
-          ])
-        ).id;
-      }
-
-      const session = await loadSingleSession(id);
-      if (!session) {
-        logError(`Session with ID ${style.bold(id)} could not be found.`);
+      if (sessionResult.err) {
+        logError(sessionResult.val);
         return;
       }
 
-      console.log(`Editing session ${style.bold(id)}:`);
+      const session = sessionResult.val;
+
+      console.log(`Editing session ${style.bold(session.id)}:`);
       console.log(
-        `Recorded for project ${style.project(
-          session.project
-        )} on ${dateToDayString(session.start)} from ${dateToTimeString(
-          session.start
-        )} to ${dateToTimeString(session.end)}${
+        `Recorded for project ${style.project(session.project)} on ${style.date(
+          dateToDayString(session.start)
+        )} from ${style.time(dateToTimeString(session.start))} to ${style.time(
+          dateToTimeString(session.end)
+        )}${
           session.tags.length
             ? ` with tag${session.tags.length > 1 ? "s" : ""} ${humanizeTags(
                 session.tags

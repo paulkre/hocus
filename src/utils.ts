@@ -20,7 +20,7 @@ export function getRelativeTime(date: Date) {
 }
 
 export function dateToTimeString(date: Date) {
-  return style.time(formatDate(date, "HH:mm"));
+  return formatDate(date, "HH:mm");
 }
 
 export function dateToDateTimeString(date: Date) {
@@ -28,7 +28,7 @@ export function dateToDateTimeString(date: Date) {
 }
 
 export function dateToDayString(date: Date) {
-  return style.date(formatDate(date, "dddd D MMMM YYYY"));
+  return formatDate(date, "dddd D MMMM YYYY");
 }
 
 export function logError(message: string) {
