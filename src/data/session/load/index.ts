@@ -14,6 +14,7 @@ import { getFilenames } from "./filenames";
 export * from "./single";
 
 export type Filter = {
+  project?: string;
   timespan?: Timespan;
   first?: number;
   last?: number;
@@ -45,6 +46,7 @@ async function loadDataOfFirstFew(
 }
 
 async function loadData({
+  project,
   timespan,
   first,
   last,
@@ -72,6 +74,9 @@ async function loadData({
   });
 
   if (timespan) sessionData = filterDataByTimespan(sessionData, timespan);
+
+  if (project)
+    sessionData = sessionData.filter((session) => session.project === project);
 
   if (first) sessionData = sessionData.slice(0, first);
   if (last) sessionData = sessionData.slice(-last);

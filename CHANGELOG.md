@@ -4,9 +4,10 @@
 
 ### Added
 
-- Support for editing sessions with `hocus edit`
-- Support for adding new sessions with `hocus add`
-- Support for renaming projects with `hocus rename`
+- Support editing sessions with `hocus edit`
+- Support adding new sessions with `hocus add`
+- Support renaming projects with `hocus rename`
+- Support removing sessions by ID and by project name with `hocus remove ...`
 
 ### Changed
 

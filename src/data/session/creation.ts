@@ -15,11 +15,12 @@ const createRandomID = customAlphabet(
 export function restoreSession(data: SessionData): Session {
   const start = new Date(1000 * data.start);
   const end = new Date(1000 * data.end);
-  const id = `${data.localID}-${dateToID(start)}`;
+  const dateID = dateToID(start);
   const tags = data.tags || [];
 
   return {
-    id,
+    id: `${data.localID}-${dateID}`,
+    dateID,
     project: data.project,
     start,
     end,

@@ -11,6 +11,7 @@ export type SessionData = {
 
 export type Session = {
   id: string;
+  dateID: string;
   start: Date;
   end: Date;
   project: string;
@@ -34,4 +35,12 @@ export function sessionsAreEqual(a: Session, b: Session): boolean {
     a.tags.length === b.tags.length &&
     a.tags.every((tag, i) => tag === b.tags[i])
   );
+}
+
+export function dateIDToFilename(id: string) {
+  const monthNum = parseInt(id, 36);
+  const months = (monthNum % 12) + 1;
+  return `${SESSION_START_YEAR + Math.floor(monthNum / 12)}-${
+    months < 10 ? "0" : ""
+  }${months}.json`;
 }
