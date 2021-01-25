@@ -19,7 +19,7 @@ export function createStartCommand() {
         "session"
       )} (comma or space separated)`
     )
-    .description(`Start a new ${style.project("session")}`)
+    .description(`Start a new ${style.session("session")}`)
     .action(async (project: string | undefined, opt: Options) => {
       if (project) project = project.trim();
       const tags = opt.tags ? parseTags(opt.tags.join(" ")) : [];

@@ -1,5 +1,6 @@
 import chalk from "chalk";
 
+export const session = (value: string) => chalk.rgb(255, 165, 0).bold(value);
 export const project = (value: string) => chalk.magenta.bold(value);
 export const time = (value: string) => chalk.green.bold(value);
 export const date = (value: string) => chalk.cyan.bold(value);

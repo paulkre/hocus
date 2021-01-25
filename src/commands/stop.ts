@@ -38,6 +38,6 @@ export async function runStopAction() {
 
 export function createStopCommand() {
   return createCommand("stop")
-    .description(`Stop the current ${style.project("session")}`)
+    .description(`Stop the current ${style.session("session")}`)
     .action(runStopAction);
 }

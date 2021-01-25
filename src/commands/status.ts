@@ -6,7 +6,7 @@ import * as style from "../style";
 export function createStatusCommand() {
   return createCommand("status")
     .description(
-      `Display the status of the current ${style.project("session")}`
+      `Display the status of the current ${style.session("session")}`
     )
     .action(async () => {
       const state = await loadCurrentSession();
