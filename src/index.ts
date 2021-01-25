@@ -5,6 +5,7 @@ import { createStatusCommand } from "./commands/status";
 import { createStopCommand } from "./commands/stop";
 import { createLogCommand } from "./commands/log";
 import { createEditCommand } from "./commands/edit";
+import { createAddCommand } from "./commands/add";
 
 import pkg from "../package.json";
 
@@ -15,7 +16,8 @@ export function run(argv: string[]) {
     .addCommand(createStatusCommand())
     .addCommand(createStopCommand())
     .addCommand(createLogCommand())
-    .addCommand(createEditCommand());
+    .addCommand(createEditCommand())
+    .addCommand(createAddCommand());
 
   program.addHelpCommand("help [command]", "Display help for command");
 

@@ -7,11 +7,8 @@ import { parseTags } from "..";
 type FilterInput = TimespanInput & {
   from?: string;
   to?: string;
-  tags?: string[];
+  tags?: string;
 };
-
-const constructErrorMessage = (name: string) =>
-  `The ${bold(name)} value for the requested timespan is invalid`;
 
 export function parseFilter({
   from,

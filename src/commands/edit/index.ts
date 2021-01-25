@@ -16,7 +16,7 @@ import {
   dateToInputDefault,
 } from "../../utils";
 import { displayChanges } from "./display-changes";
-import { inquireSessionData } from "./inquire-session-data";
+import { inquireSessionData } from "../../inquiry/session-data";
 import { inquireSession } from "./inquire-session";
 import { parseSessionData, SessionDataInput } from "../../parsing/session-data";
 
@@ -46,7 +46,15 @@ export function createEditCommand() {
       )} with the given ${style.bold("ID")}`
     )
     .action(
-      async (id: string | undefined, cmdOptions: Partial<SessionDataInput>) => {
+      async (
+        id: string | undefined,
+        cmdOptions: {
+          project?: string;
+          start?: string;
+          end?: string;
+          tags?: string[];
+        }
+      ) => {
         const flagsExist = Object.keys(cmdOptions).length > 0;
         if (flagsExist && !id) {
           logError("Flags are only permitted if a session ID is provided.");
@@ -84,7 +92,7 @@ export function createEditCommand() {
           project: session.project,
           start: dateToInputDefault(session.start),
           end: dateToInputDefault(session.end),
-          tags: session.tags,
+          tags: session.tags.join(" "),
         };
 
         const sessionDataParseResult = parseSessionData(
@@ -92,6 +100,7 @@ export function createEditCommand() {
             ? {
                 ...defaultOptions,
                 ...cmdOptions,
+                tags: cmdOptions.tags ? cmdOptions.tags.join(" ") : "",
               }
             : await inquireSessionData(defaultOptions)
         );

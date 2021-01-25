@@ -1,10 +1,11 @@
-import { prompt } from "inquirer";
-import { SessionDataInput } from "../../parsing/session-data";
+import { prompt, DistinctQuestion } from "inquirer";
+import { SessionDataInput } from "../parsing/session-data";
 
 export async function inquireSessionData(
-  defaults: SessionDataInput
+  defaults: Partial<SessionDataInput>,
+  existing?: string[]
 ): Promise<SessionDataInput> {
-  const input = await prompt<SessionDataInput>([
+  const questions: NonNullable<DistinctQuestion>[] = [
     {
       name: "project",
       message: "Project",
@@ -25,7 +26,13 @@ export async function inquireSessionData(
       message: "Tags",
       default: defaults.tags,
     },
-  ]);
+  ];
+
+  const input = await prompt<SessionDataInput>(
+    existing
+      ? questions.filter((question) => !existing.includes(question.name!))
+      : questions
+  );
   console.log();
   return input;
 }

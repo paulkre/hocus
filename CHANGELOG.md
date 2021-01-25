@@ -4,7 +4,8 @@
 
 ### Added
 
-- Support for editing sessions with `hocus edit [id]`
+- Support for editing sessions with `hocus edit`
+- Support for adding new sessions with `hocus add`
 
 ### Changed
 

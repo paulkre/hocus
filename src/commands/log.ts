@@ -56,7 +56,10 @@ export function createLogCommand() {
       )} in the given ${style.time("timespan")}`
     )
     .action(async (options: Options) => {
-      const filterParseResult = parseFilter(options);
+      const filterParseResult = parseFilter({
+        ...options,
+        tags: options.tags ? options.tags.join(" ") : "",
+      });
       if (filterParseResult.err) {
         logError(filterParseResult.val);
         return;

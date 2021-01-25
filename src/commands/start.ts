@@ -22,7 +22,7 @@ export function createStartCommand() {
     .description(`Start a new ${style.project("session")}`)
     .action(async (project: string | undefined, opt: Options) => {
       if (project) project = project.trim();
-      const tags = opt.tags ? parseTags(opt.tags) : [];
+      const tags = opt.tags ? parseTags(opt.tags.join(" ")) : [];
 
       if (!project) {
         project = (
