@@ -6,6 +6,7 @@ import { createStopCommand } from "./commands/stop";
 import { createLogCommand } from "./commands/log";
 import { createEditCommand } from "./commands/edit";
 import { createAddCommand } from "./commands/add";
+import { createRenameCommand } from "./commands/rename";
 
 import pkg from "../package.json";
 
@@ -17,7 +18,8 @@ export function run(argv: string[]) {
     .addCommand(createStopCommand())
     .addCommand(createLogCommand())
     .addCommand(createEditCommand())
-    .addCommand(createAddCommand());
+    .addCommand(createAddCommand())
+    .addCommand(createRenameCommand());
 
   program.addHelpCommand("help [command]", "Display help for command");
 

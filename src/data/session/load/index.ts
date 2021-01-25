@@ -1,5 +1,4 @@
 import { join as pathJoin } from "path";
-import { readdirSync } from "fs";
 import { Session, SessionData } from "..";
 import { restoreSession } from "../creation";
 import { config } from "../../../config";
@@ -10,6 +9,7 @@ import {
   filterDataByTimespan,
   Timespan,
 } from "./timespan";
+import { getFilenames } from "./filenames";
 
 export * from "./single";
 
@@ -19,17 +19,6 @@ export type Filter = {
   last?: number;
   tags?: string[];
 };
-
-function getDataFilenames() {
-  return readdirSync(config.dataDirectory, {
-    withFileTypes: true,
-  })
-    .filter(
-      (dirent) => dirent.isFile() && dirent.name.match(/^\d\d\d\d-\d\d\.json$/)
-    )
-    .map((dirent) => dirent.name)
-    .sort((a, b) => a.localeCompare(b));
-}
 
 function filterDataByTags(data: SessionData[], tags: string[]) {
   return data.filter((session) => {
@@ -61,7 +50,7 @@ async function loadData({
   last,
   tags,
 }: Filter): Promise<SessionData[]> {
-  let filenames = getDataFilenames();
+  let filenames = getFilenames();
   if (!filenames.length) return [];
 
   if (first && !last && !timespan)
