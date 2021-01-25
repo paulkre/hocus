@@ -9,6 +9,7 @@ import {
 import { parseFilter } from "../parsing/filter";
 import columnify from "columnify";
 import * as style from "../style";
+import { spawnSync } from "child_process";
 
 const dateToDayNum = (date: Date) => Math.floor(date.getTime() / 86_400_000);
 
@@ -18,7 +19,12 @@ type Options = {
   first?: string;
   last?: string;
   tags?: string[];
+  raw?: boolean;
 };
+
+function outputViaPager(text: string) {
+  spawnSync(`echo "${text}" | less -R`, [], { shell: true, stdio: "inherit" });
+}
 
 export function createLogCommand() {
   return createCommand("log")
@@ -34,21 +40,25 @@ export function createLogCommand() {
     )
     .option(
       "--first <first>",
-      `The number of ${style.project(
+      `The number of ${style.session(
         "sessions"
       )} to include from the beginning of the selection`
     )
     .option(
       "--last <last>",
-      `The number of ${style.project(
+      `The number of ${style.session(
         "sessions"
       )} to include from the beginning of the selection`
     )
     .option(
       "-T, --tags <tags...>",
-      `Only ${style.project("sessions")} with the specified ${style.tag(
+      `Only ${style.session("sessions")} with the specified ${style.tag(
         "tags"
       )} will be logged`
+    )
+    .option(
+      "-r, --raw",
+      "Output log directly to the terminal instead of passing it to the pager"
     )
     .description(
       `Display each recorded ${style.project(
@@ -90,47 +100,52 @@ export function createLogCommand() {
         ([a], [b]) => b.getTime() - a.getTime()
       );
 
-      dayEntries.forEach(([day, sessions], i) => {
+      let output = "";
+      dayEntries.forEach(([day, sessions]) => {
         let dayTotalSeconds = 0;
         for (const { totalSeconds } of sessions)
           dayTotalSeconds += totalSeconds;
-        console.log(
-          `${style.date(dateToDayString(day))} (${style.time(
-            durationToString(dayTotalSeconds)
-          )})`
-        );
-        console.log(
-          columnify(
-            sessions.map((session) => ({
-              id: style.id(session.id),
-              from: style.time(dateToTimeString(session.start)),
-              sep0: "to",
-              to: style.time(dateToTimeString(session.end)),
-              duration: style.bold(durationToString(session.totalSeconds)),
-              project: style.project(
-                session.project.length > 20
-                  ? `${session.project.slice(0, 19)}…`
-                  : session.project
-              ),
-              tags: session.tags.length
-                ? `[${session.tags.map((tag) => style.tag(tag)).join(", ")}]`
-                : "",
-            })),
-            {
-              showHeaders: false,
-              columnSplitter: "    ",
-              config: {
-                id: {
-                  minWidth: 14,
-                  align: "right",
-                },
-                duration: { align: "right" },
-                project: { align: "right" },
+        const heading = `${style.date(dateToDayString(day))} (${style.time(
+          durationToString(dayTotalSeconds)
+        )})`;
+
+        const table = columnify(
+          sessions.map((session) => ({
+            id: style.id(session.id),
+            from: style.time(dateToTimeString(session.start)),
+            sep0: "to",
+            to: style.time(dateToTimeString(session.end)),
+            duration: style.bold(durationToString(session.totalSeconds)),
+            project: style.project(
+              session.project.length > 20
+                ? `${session.project.slice(0, 19)}…`
+                : session.project
+            ),
+            tags: session.tags.length
+              ? `[${session.tags.map((tag) => style.tag(tag)).join(", ")}]`
+              : "",
+          })),
+          {
+            showHeaders: false,
+            columnSplitter: "    ",
+            config: {
+              id: {
+                minWidth: 14,
+                align: "right",
               },
-            }
-          )
+              duration: { align: "right" },
+              project: { align: "right" },
+            },
+          }
         );
-        if (i < dayEntries.length - 1) console.log();
+
+        output += `${heading}
+${table}
+
+`;
       });
+
+      if (options.raw) console.log(output);
+      else outputViaPager(output);
     });
 }
