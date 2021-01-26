@@ -1,11 +1,12 @@
 import { createCommand } from "../command";
-import { clearCurrentSession, loadCurrentSession } from "../data/state";
-import { storeSession, createSession } from "../data/session";
+import { loadState, storeState } from "../data/state";
+import { storeSession } from "../data/session";
 import { getRelativeTime, logError } from "../utils";
+import { createSession } from "../entities/session";
 import * as style from "../style";
 
 export async function runStopAction() {
-  const currentSession = await loadCurrentSession();
+  const { currentSession } = await loadState();
 
   if (!currentSession) {
     console.log("No project is currently being tracked.");
@@ -15,7 +16,7 @@ export async function runStopAction() {
   const session = createSession({
     project: currentSession.project,
     start: currentSession.start,
-    end: Math.floor(Date.now() / 1000),
+    end: new Date(),
     tags: currentSession.tags,
   });
 
@@ -25,12 +26,11 @@ export async function runStopAction() {
     return;
   }
 
-  await clearCurrentSession();
-  const date = new Date(1000 * currentSession.start);
+  await storeState({});
   console.log(
     `Stopping session for project ${style.project(
       currentSession.project
-    )} which was started ${getRelativeTime(date)}. ${style.id(
+    )} which was started ${getRelativeTime(currentSession.start)}. ${style.id(
       `(ID: ${session.id})`
     )}`
   );

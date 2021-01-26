@@ -1,5 +1,5 @@
 import columnify from "columnify";
-import { Session } from "../../data/session";
+import { Session } from "../../entities/session";
 import * as style from "../../style";
 import { dateToInputDefault } from "../../utils";
 
@@ -12,28 +12,33 @@ export function displayChanges(session: Session, editedSession: Session) {
       style.project(editedSession.project),
     ]);
 
-  if (session.data.start !== editedSession.data.start)
+  if (session.startSeconds !== editedSession.startSeconds)
     changes.push([
       "start",
       dateToInputDefault(session.start),
       style.date(dateToInputDefault(editedSession.start)),
     ]);
 
-  if (session.data.end !== editedSession.data.end)
+  if (session.endSeconds !== editedSession.endSeconds)
     changes.push([
       "end",
       dateToInputDefault(session.end),
       style.date(dateToInputDefault(editedSession.end)),
     ]);
 
+  const tagsA = session.tags;
+  const tagsB = editedSession.tags;
   if (
-    session.tags.length !== editedSession.tags.length ||
-    !session.tags.every((tag, i) => tag === editedSession.tags[i])
+    tagsA !== tagsB ||
+    (tagsA &&
+      tagsB &&
+      (tagsA.length !== tagsB.length ||
+        !tagsA!.every((tag, i) => tag === tagsB![i])))
   )
     changes.push([
       "tags",
-      `[${session.tags.join(", ")}]`,
-      `[${editedSession.tags.map((tag) => style.tag(tag)).join(", ")}]`,
+      `[${tagsA ? tagsA.join(", ") : ""}]`,
+      `[${tagsB ? tagsB.map((tag) => style.tag(tag)).join(", ") : ""}]`,
     ]);
 
   console.log(

@@ -1,27 +1,57 @@
 import { join as pathJoin } from "path";
 import { config } from "../config";
 import { createFile } from "./file";
-import { SessionData } from "./session";
+import { State, StateSession } from "../entities/state";
 
-type RunningSession = Omit<SessionData, "localID" | "end">;
-type State = {
-  currentSession?: RunningSession | null;
+type StateSessionData = {
+  project: string;
+  start: number;
+  tags?: string[];
 };
 
-const file = createFile(pathJoin(config.appDirectory, "state.json"));
+type StateData = {
+  currentSession?: StateSessionData;
+};
 
-export async function loadCurrentSession(): Promise<RunningSession | null> {
-  const state = (await file.load()) as State;
-  if (!state) return null;
-  return state.currentSession ? state.currentSession : null;
+function serializeSessionState(props: StateSession): StateSessionData {
+  return {
+    ...props,
+    start: Math.floor(props.start.getTime() / 1000),
+  };
 }
 
-export async function clearCurrentSession() {
-  const state: State = (await file.load()) || {};
-  file.store({ ...state, currentSession: null });
+function serializeState(state: State): StateData {
+  return {
+    ...state,
+    currentSession:
+      state.currentSession && serializeSessionState(state.currentSession),
+  };
 }
 
-export async function storeCurrentSession(currentSession: RunningSession) {
-  const state: State = (await file.load()) || {};
-  file.store({ ...state, currentSession });
+function createStateSessionFromData(data: StateSessionData): StateSession {
+  return {
+    project: data.project,
+    start: new Date(1000 * data.start),
+  };
+}
+
+function createStateFromData(data: StateData): State {
+  return {
+    currentSession:
+      data.currentSession && createStateSessionFromData(data.currentSession),
+  };
+}
+
+const file = createFile<StateData>(
+  pathJoin(config.appDirectory, "state.json"),
+  (value): value is StateData => typeof value === "object"
+);
+
+export async function loadState(): Promise<State> {
+  const data = await file.load();
+  return data ? createStateFromData(data) : {};
+}
+
+export function storeState(state: State) {
+  return file.store(serializeState(state));
 }

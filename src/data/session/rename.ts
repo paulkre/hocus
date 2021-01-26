@@ -1,22 +1,15 @@
-import { join as pathJoin } from "path";
 import { getFilenames } from "./load/filenames";
-import { createFile } from "./../file";
-import { config } from "./../../config";
-import { Session, SessionData } from ".";
-import { createSession } from "./creation";
+import { createSessionFile, createSessionFromData, SessionData } from "./data";
+import { Session } from "../../entities/session";
 
 export async function renameProjectInSessions(
   projectName: string,
   newProjectName: string
 ): Promise<Session[]> {
   const filenames = await getFilenames();
-  const files = filenames.map((filename) =>
-    createFile(pathJoin(config.dataDirectory, filename))
-  );
+  const files = filenames.map((filename) => createSessionFile(filename));
 
-  const fileContents = (await Promise.all(
-    files.map((file) => file.load())
-  )) as SessionData[][];
+  const fileContents = await Promise.all(files.map((file) => file.load()));
 
   const editedData: SessionData[] = [];
   const editedContents = fileContents.map((data) => {
@@ -44,5 +37,5 @@ export async function renameProjectInSessions(
     })
   );
 
-  return editedData.map((data) => createSession(data));
+  return editedData.map((data) => createSessionFromData(data));
 }

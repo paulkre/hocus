@@ -1,5 +1,6 @@
 import { createCommand } from "../command";
-import { loadSessions, Session } from "../data/session";
+import { Session } from "../entities/session";
+import { loadSessions } from "../data/session";
 import {
   dateToDayString,
   dateToTimeString,
@@ -104,28 +105,28 @@ export function createLogCommand() {
       let output = "";
       dayEntries.forEach(([day, sessions], i) => {
         let dayTotalSeconds = 0;
-        for (const { totalSeconds } of sessions)
-          dayTotalSeconds += totalSeconds;
+        for (const { startSeconds, endSeconds } of sessions)
+          dayTotalSeconds += endSeconds - startSeconds;
         const heading = `${style.date(dateToDayString(day))} (${style.time(
           durationToString(dayTotalSeconds)
         )})`;
 
         const table = columnify(
-          sessions.map((session) => ({
-            id: style.id(session.id),
-            from: style.time(dateToTimeString(session.start)),
-            sep0: "to",
-            to: style.time(dateToTimeString(session.end)),
-            duration: style.bold(durationToString(session.totalSeconds)),
-            project: style.project(
-              session.project.length > 20
-                ? `${session.project.slice(0, 19)}…`
-                : session.project
-            ),
-            tags: session.tags.length
-              ? `[${session.tags.map((tag) => style.tag(tag)).join(", ")}]`
-              : "",
-          })),
+          sessions.map(
+            ({ id, project, start, end, startSeconds, endSeconds, tags }) => ({
+              id: style.id(id),
+              from: style.time(dateToTimeString(start)),
+              sep0: "to",
+              to: style.time(dateToTimeString(end)),
+              duration: style.bold(durationToString(endSeconds - startSeconds)),
+              project: style.project(
+                project.length > 20 ? `${project.slice(0, 19)}…` : project
+              ),
+              tags: tags
+                ? `[${tags.map((tag) => style.tag(tag)).join(", ")}]`
+                : "",
+            })
+          ),
           {
             showHeaders: false,
             columnSplitter: "    ",

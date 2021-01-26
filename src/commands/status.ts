@@ -1,5 +1,5 @@
 import { createCommand } from "../command";
-import { loadCurrentSession } from "../data/state";
+import { loadState } from "../data/state";
 import { getRelativeTime, dateToDateTimeString } from "../utils";
 import * as style from "../style";
 
@@ -9,18 +9,19 @@ export function createStatusCommand() {
       `Display the status of the current ${style.session("session")}`
     )
     .action(async () => {
-      const state = await loadCurrentSession();
+      const { currentSession } = await loadState();
 
-      if (!state) {
+      if (!currentSession) {
         console.log("No project is currently being tracked.");
         return;
       }
 
-      const date = new Date(1000 * state.start);
+      const { project, start } = currentSession;
+
       console.log(
-        `Project ${style.project(state.project)} started ${getRelativeTime(
-          date
-        )} (${style.date(dateToDateTimeString(date))})`
+        `Project ${style.project(project)} started ${getRelativeTime(
+          start
+        )} (${style.date(dateToDateTimeString(start))})`
       );
     });
 }

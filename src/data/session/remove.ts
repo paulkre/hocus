@@ -1,46 +1,39 @@
-import { join as pathJoin } from "path";
 import { Result, Ok, Err } from "ts-results";
-import { Session, SessionData } from ".";
-import { dateIDToFilename } from "./date";
+import { Session } from "../../entities/session";
+import { createSessionFileFromDate, SessionData } from "./data";
 import { createFile } from "../file";
-import { config } from "../../config";
 
 export async function removeSession({
-  dateID,
-  data: { localID },
+  localID,
+  start,
 }: Session): Promise<Result<void, string>> {
-  const file = createFile(
-    pathJoin(config.dataDirectory, dateIDToFilename(dateID))
-  );
-  const data = (await file.load()) as SessionData[];
+  const file = createSessionFileFromDate(start);
+  const data = await file.load();
 
   if (!data) return Err("Session could not be loaded from disk.");
 
-  const foundIndex = data.findIndex((session) => session.localID === localID);
+  const foundIndex = data.findIndex((other) => other.localID === localID);
   if (foundIndex < 0) return Err("Session could not be found in data.");
 
   data.splice(foundIndex, 1);
 
-  return Ok(file.store(data, true));
+  await file.store(data, true);
+
+  return Ok(undefined);
 }
 
 type CacheValue = [ReturnType<typeof createFile>, SessionData[] | null];
 export async function removeSessions(sessions: Session[]): Promise<void> {
   const dataCache = new Map<string, CacheValue>();
 
-  for (const { dateID } of sessions) {
+  for (const { dateID, start } of sessions) {
     if (!dataCache.has(dateID)) {
-      const file = createFile(
-        pathJoin(config.dataDirectory, dateIDToFilename(dateID))
-      );
+      const file = createSessionFileFromDate(start);
       dataCache.set(dateID, [file, await file.load()]);
     }
   }
 
-  for (const {
-    dateID,
-    data: { localID },
-  } of sessions) {
+  for (const { dateID, localID } of sessions) {
     const [, data] = dataCache.get(dateID)!;
     if (!data) return;
 
@@ -50,7 +43,9 @@ export async function removeSessions(sessions: Session[]): Promise<void> {
     data.splice(foundIndex, 1);
   }
 
-  Array.from(dataCache.values()).forEach(([file, data]) => {
-    if (data) file.store(data);
-  });
+  await Promise.all(
+    Array.from(dataCache.values()).map(
+      ([file, data]) => data && file.store(data)
+    )
+  );
 }

@@ -1,22 +1,16 @@
 import { createCommand } from "../../command";
-import {
-  restoreSession,
-  sessionsAreEqual,
-  storeSession,
-} from "../../data/session";
+import { storeSession } from "../../data/session";
 import * as style from "../../style";
 import {
   dateToDayString,
   dateToTimeString,
   logError,
   humanizeTags,
-  dateToInputDefault,
 } from "../../utils";
 import { displayChanges } from "./display-changes";
-import { inquireSessionData } from "../../input/inquiry/session-data";
 import { inquireSession } from "../../input/inquiry/session";
-import { parseSessionData, SessionDataInput } from "../../parsing/session-data";
-import { parseSession } from "../../parsing/session";
+import { parseSessionData } from "../../parsing/session-data";
+import { parseSessionID } from "../../parsing/session-id";
 import { requestSessionDataViaEditor } from "../../input/editor/session-data";
 
 export function createEditCommand() {
@@ -38,7 +32,7 @@ export function createEditCommand() {
       )} with the given ${style.bold("ID")}`
     )
     .action(async (id: string | undefined) => {
-      const sessionResult = await (id ? parseSession(id) : inquireSession());
+      const sessionResult = await (id ? parseSessionID(id) : inquireSession());
 
       if (sessionResult.err) {
         logError(sessionResult.val);
@@ -54,7 +48,7 @@ export function createEditCommand() {
         )} from ${style.time(dateToTimeString(session.start))} to ${style.time(
           dateToTimeString(session.end)
         )}${
-          session.tags.length
+          session.tags
             ? ` with tag${session.tags.length > 1 ? "s" : ""} ${humanizeTags(
                 session.tags
               )}`
@@ -76,12 +70,9 @@ export function createEditCommand() {
         return;
       }
 
-      const editedSession = restoreSession({
-        ...sessionDataParseResult.val,
-        localID: session.data.localID,
-      });
+      const editedSession = session.modify(sessionDataParseResult.val);
 
-      if (sessionsAreEqual(session, editedSession)) {
+      if (session.isIdenticalTo(editedSession)) {
         console.log("No changes were made.");
         return;
       }

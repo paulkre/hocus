@@ -1,8 +1,7 @@
 import { createCommand } from "../../command";
-import { loadSingleSession } from "../../data/session";
 import { removeSession } from "../../data/session/remove";
 import { inquireSession } from "../../input/inquiry/session";
-import { parseSession } from "../../parsing/session";
+import { parseSessionID } from "../../parsing/session-id";
 import * as style from "../../style";
 import { logError } from "../../utils";
 
@@ -11,7 +10,7 @@ export function createRemoveSessionCommand() {
     .arguments("[id]")
     .description(`Remove a ${style.session("session")}`)
     .action(async (id: string | undefined) => {
-      const sessionResult = await (id ? parseSession(id) : inquireSession());
+      const sessionResult = await (id ? parseSessionID(id) : inquireSession());
       if (sessionResult.err) {
         logError(sessionResult.val);
         return;

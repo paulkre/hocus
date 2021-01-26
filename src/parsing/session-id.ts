@@ -1,8 +1,9 @@
 import { Err, Ok, Result } from "ts-results";
-import { loadSingleSession, Session } from "../data/session";
+import { Session } from "../entities/session";
+import { loadSingleSession } from "../data/session";
 import { bold } from "../style";
 
-export async function parseSession(
+export async function parseSessionID(
   id: string
 ): Promise<Result<Session, string>> {
   const session = await loadSingleSession(id);

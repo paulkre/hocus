@@ -1,7 +1,6 @@
 import { Result, Ok, Err } from "ts-results";
 import { Filter } from "../../data/session/load";
 import { parseTimespan, TimespanInput } from "./timespan";
-import { bold } from "../../style";
 import { parseTags } from "..";
 
 type FilterInput = TimespanInput & {

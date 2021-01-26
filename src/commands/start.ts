@@ -1,6 +1,6 @@
 import inquirer from "inquirer";
 import { createCommand } from "../command";
-import { loadCurrentSession, storeCurrentSession } from "../data/state";
+import { loadState, storeState } from "../data/state";
 import { dateToTimeString, humanizeTags, logError } from "../utils";
 import { parseTags } from "../parsing";
 import { runStopAction } from "./stop";
@@ -31,7 +31,7 @@ export function createStartCommand() {
         return;
       }
 
-      const currentSession = await loadCurrentSession();
+      const { currentSession } = await loadState();
       if (currentSession) {
         console.log(
           `Project ${style.project(currentSession.project)} already started.`
@@ -54,16 +54,12 @@ export function createStartCommand() {
         await runStopAction();
       }
 
-      const date = new Date();
+      const start = new Date();
       console.log(
         `Starting project ${style.project(project)}${
           tags ? ` with tags ${humanizeTags(tags)}` : ""
-        } at ${style.time(dateToTimeString(date))}.`
+        } at ${style.time(dateToTimeString(start))}.`
       );
-      return storeCurrentSession({
-        project,
-        start: Math.floor(date.getTime() / 1000),
-        tags,
-      });
+      return storeState({ currentSession: { project, start, tags } });
     });
 }

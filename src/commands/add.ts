@@ -1,8 +1,8 @@
 import { createCommand } from "../command";
 import * as style from "../style";
-import { createSession, loadSessions, storeSession } from "../data/session";
+import { createSession } from "../entities/session";
+import { loadSessions, storeSession } from "../data/session";
 import { inquireSessionData } from "../input/inquiry/session-data";
-import { inquireProjectName } from "../input/inquiry/project-name";
 import { parseSessionData, SessionDataInput } from "../parsing/session-data";
 import { logError } from "../utils";
 

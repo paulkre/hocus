@@ -1,33 +1,31 @@
 import { dirname } from "path";
-import {
-  existsSync,
-  readFile as nodeReadFile,
-  writeFileSync,
-  unlinkSync,
-  renameSync,
-} from "fs";
+import { existsSync, unlinkSync, renameSync, promises as fs } from "fs";
 import mkdirp from "mkdirp";
 import { logError } from "../utils";
 import chalk from "chalk";
 
-async function readFile(filePath: string): Promise<Buffer> {
-  return new Promise((resolve, reject) => {
-    nodeReadFile(filePath, null, (err, data) => {
-      if (err) reject(err);
-      else resolve(data);
-    });
-  });
-}
+const { readFile, writeFile } = fs;
 
-export function createFile(path: string) {
+export type File<T> = {
+  load(): Promise<T | null>;
+  store(value: T, pretty?: boolean): Promise<void>;
+  delete(): void;
+};
+
+export function createFile<T>(
+  path: string,
+  isType: (value: any) => value is T
+): File<T> {
   const directory = dirname(path);
 
   return {
-    async load(): Promise<any | null> {
+    async load() {
       if (existsSync(path)) {
         const data = await readFile(path);
         try {
-          return JSON.parse(data.toString());
+          const content = JSON.parse(data.toString());
+          if (!isType(content)) throw Error();
+          return content;
         } catch {
           logError(`File ${chalk.bold(path)} seems to be corrupted`);
           const backupPath = `${path}.bak`;
@@ -43,11 +41,12 @@ export function createFile(path: string) {
 
       return null;
     },
-    store(value: any, pretty?: boolean) {
+
+    store(value, pretty) {
       if (!existsSync(directory)) mkdirp.sync(directory);
-      writeFileSync(path, JSON.stringify(value, null, pretty ? 1 : 0));
+      return writeFile(path, JSON.stringify(value, null, pretty ? 1 : 0));
     },
-    storeArray() {},
+
     delete() {
       unlinkSync(path);
     },
