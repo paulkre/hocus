@@ -19,15 +19,15 @@ async function readFile(filePath: string): Promise<Buffer> {
   });
 }
 
-export function createFile<T>(path: string) {
+export function createFile(path: string) {
   const directory = dirname(path);
 
   return {
-    async load(): Promise<T | null> {
+    async load(): Promise<any | null> {
       if (existsSync(path)) {
         const data = await readFile(path);
         try {
-          return JSON.parse(data.toString()) as T;
+          return JSON.parse(data.toString());
         } catch {
           logError(`File ${chalk.bold(path)} seems to be corrupted`);
           const backupPath = `${path}.bak`;
@@ -43,7 +43,7 @@ export function createFile<T>(path: string) {
 
       return null;
     },
-    store(value: T, pretty?: boolean) {
+    store(value: any, pretty?: boolean) {
       if (!existsSync(directory)) mkdirp.sync(directory);
       writeFileSync(path, JSON.stringify(value, null, pretty ? 1 : 0));
     },

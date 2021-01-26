@@ -8,10 +8,10 @@ type State = {
   currentSession?: RunningSession | null;
 };
 
-const file = createFile<State>(pathJoin(config.appDirectory, "state.json"));
+const file = createFile(pathJoin(config.appDirectory, "state.json"));
 
 export async function loadCurrentSession(): Promise<RunningSession | null> {
-  const state = await file.load();
+  const state = (await file.load()) as State;
   if (!state) return null;
   return state.currentSession ? state.currentSession : null;
 }

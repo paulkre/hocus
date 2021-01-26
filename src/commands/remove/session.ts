@@ -1,19 +1,23 @@
 import { createCommand } from "../../command";
 import { loadSingleSession } from "../../data/session";
 import { removeSession } from "../../data/session/remove";
+import { inquireSession } from "../../input/inquiry/session";
+import { parseSession } from "../../parsing/session";
 import * as style from "../../style";
 import { logError } from "../../utils";
 
 export function createRemoveSessionCommand() {
   return createCommand("session")
-    .arguments("<id>")
+    .arguments("[id]")
     .description(`Remove a ${style.session("session")}`)
-    .action(async (id: string) => {
-      const session = await loadSingleSession(id);
-      if (!session) {
-        logError(`A session with ID ${style.bold(id)} does not exist.`);
+    .action(async (id: string | undefined) => {
+      const sessionResult = await (id ? parseSession(id) : inquireSession());
+      if (sessionResult.err) {
+        logError(sessionResult.val);
         return;
       }
+
+      const session = sessionResult.val;
 
       const removeResult = await removeSession(session);
       if (removeResult.err) {
@@ -21,6 +25,8 @@ export function createRemoveSessionCommand() {
         return;
       }
 
-      console.log(`Session ${style.bold(id)} was removed successfully.`);
+      console.log(
+        `Session ${style.bold(session.id)} was removed successfully.`
+      );
     });
 }

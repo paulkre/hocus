@@ -1,20 +1,22 @@
 import { join as pathJoin } from "path";
-import { dateIDToFilename, SessionData, Session } from "..";
+import { SessionData, Session } from "..";
+import { dateIDToFilename } from "../date";
 import { restoreSession } from "../creation";
 import { config } from "../../../config";
 import { createFile } from "../../file";
 
 function isValidID(value: string) {
-  return value.match(/^[A-Za-z0-9]{4}-[A-Za-z0-9]{3}$/);
+  return value.match(/^[a-z0-9]{7}$/);
 }
 
 export async function loadSingleSession(id: string): Promise<Session | null> {
   if (!isValidID(id)) return null;
-  const [localID, dateID] = id.split("-");
+  const dateID = id.slice(0, 3);
+  const localID = id.slice(3, 7);
   if (!dateID) return null;
-  const contents = await createFile<SessionData[]>(
+  const contents = (await createFile(
     pathJoin(config.dataDirectory, dateIDToFilename(dateID))
-  ).load();
+  ).load()) as SessionData[];
   if (!contents) return null;
   const data = contents.find((sessionData) => sessionData.localID === localID);
   if (!data) return null;

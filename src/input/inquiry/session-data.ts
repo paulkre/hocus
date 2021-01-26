@@ -1,5 +1,5 @@
 import { prompt, DistinctQuestion } from "inquirer";
-import { SessionDataInput } from "../parsing/session-data";
+import { SessionDataInput } from "../../parsing/session-data";
 
 export async function inquireSessionData(
   defaults: Partial<SessionDataInput>,

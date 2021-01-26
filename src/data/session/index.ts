@@ -1,4 +1,3 @@
-export const SESSION_START_YEAR = 1900;
 export const SESSION_MAX_DURATION = 2_419_200; // in seconds
 
 export type SessionData = {
@@ -35,12 +34,4 @@ export function sessionsAreEqual(a: Session, b: Session): boolean {
     a.tags.length === b.tags.length &&
     a.tags.every((tag, i) => tag === b.tags[i])
   );
-}
-
-export function dateIDToFilename(id: string) {
-  const monthNum = parseInt(id, 36);
-  const months = (monthNum % 12) + 1;
-  return `${SESSION_START_YEAR + Math.floor(monthNum / 12)}-${
-    months < 10 ? "0" : ""
-  }${months}.json`;
 }

@@ -1,18 +1,18 @@
 import { join as pathJoin } from "path";
 import { Result, Ok, Err } from "ts-results";
-import { dateIDToFilename, Session, SessionData } from ".";
+import { Session, SessionData } from ".";
+import { dateIDToFilename } from "./date";
 import { createFile } from "../file";
 import { config } from "../../config";
-import data from "*.json";
 
 export async function removeSession({
   dateID,
   data: { localID },
 }: Session): Promise<Result<void, string>> {
-  const file = createFile<SessionData[]>(
+  const file = createFile(
     pathJoin(config.dataDirectory, dateIDToFilename(dateID))
   );
-  const data = await file.load();
+  const data = (await file.load()) as SessionData[];
 
   if (!data) return Err("Session could not be loaded from disk.");
 
@@ -30,7 +30,7 @@ export async function removeSessions(sessions: Session[]): Promise<void> {
 
   for (const { dateID } of sessions) {
     if (!dataCache.has(dateID)) {
-      const file = createFile<SessionData[]>(
+      const file = createFile(
         pathJoin(config.dataDirectory, dateIDToFilename(dateID))
       );
       dataCache.set(dateID, [file, await file.load()]);

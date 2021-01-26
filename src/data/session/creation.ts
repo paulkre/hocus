@@ -1,14 +1,9 @@
 import { customAlphabet } from "nanoid";
-import { SESSION_START_YEAR, SessionData, Session, SessionBlueprint } from ".";
-
-function dateToID(date: Date) {
-  const monthNum =
-    12 * (date.getFullYear() - SESSION_START_YEAR) + date.getMonth();
-  return monthNum.toString(36).toUpperCase();
-}
+import { SessionData, Session, SessionBlueprint } from ".";
+import { dateToID } from "./date";
 
 const createRandomID = customAlphabet(
-  "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+  "0123456789abcdefghijklmnopqrstuvwxyz",
   4
 );
 
@@ -19,7 +14,7 @@ export function restoreSession(data: SessionData): Session {
   const tags = data.tags || [];
 
   return {
-    id: `${data.localID}-${dateID}`,
+    id: `${dateID}${data.localID}`,
     dateID,
     project: data.project,
     start,

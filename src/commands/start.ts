@@ -1,10 +1,11 @@
+import inquirer from "inquirer";
 import { createCommand } from "../command";
 import { loadCurrentSession, storeCurrentSession } from "../data/state";
-import { dateToTimeString, humanizeTags } from "../utils";
+import { dateToTimeString, humanizeTags, logError } from "../utils";
 import { parseTags } from "../parsing";
-import inquirer from "inquirer";
 import { runStopAction } from "./stop";
 import * as style from "../style";
+import { inquireProjectName } from "../input/inquiry/project-name";
 
 type Options = {
   tags?: string[];
@@ -22,18 +23,12 @@ export function createStartCommand() {
     .description(`Start a new ${style.session("session")}`)
     .action(async (project: string | undefined, opt: Options) => {
       if (project) project = project.trim();
-      const tags = opt.tags ? parseTags(opt.tags.join(" ")) : [];
+      const tags = opt.tags && parseTags(opt.tags.join(" "));
 
+      if (!project) project = await inquireProjectName();
       if (!project) {
-        project = (
-          await inquirer.prompt<{ project: string }>([
-            {
-              name: "project",
-              message: "Which project will you be working on?",
-              default: "hello-world",
-            },
-          ])
-        ).project;
+        logError("Project has to be specified.");
+        return;
       }
 
       const currentSession = await loadCurrentSession();
@@ -62,7 +57,7 @@ export function createStartCommand() {
       const date = new Date();
       console.log(
         `Starting project ${style.project(project)}${
-          tags.length ? ` with tags ${humanizeTags(tags)}` : ""
+          tags ? ` with tags ${humanizeTags(tags)}` : ""
         } at ${style.time(dateToTimeString(date))}.`
       );
       return storeCurrentSession({

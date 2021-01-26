@@ -28,10 +28,11 @@ async function findCollidingSession(
     } = session;
     if (
       id !== otherID &&
-      ((start >= otherStart && start <= otherEnd) ||
-        (end >= otherStart && end <= otherEnd) ||
-        (otherStart >= start && otherStart <= end) ||
-        (otherEnd >= start && otherEnd <= end))
+      ((start > otherStart && start < otherEnd) ||
+        (end > otherStart && end < otherEnd) ||
+        (otherStart > start && otherStart < end) ||
+        (otherEnd > start && otherEnd < end) ||
+        (start === otherStart && end === otherEnd))
     )
       return session;
   }
@@ -46,20 +47,18 @@ export async function storeSession(
 
   if (data.end - data.start > SESSION_MAX_DURATION)
     return Err(
-      `The new session has a duration of over 4 weeks and thus cannot be saved.
+      `Session has a duration of over 4 weeks and thus cannot be saved.
 Run ${chalk.bold("hocus cancel")} to stop the current session without saving.`
     );
 
-  const secondsNow = Math.floor(new Date().getTime());
+  const secondsNow = Math.floor(new Date().getTime() / 1000);
   if (secondsNow < data.start || secondsNow < data.end)
     return Err("Sessions that take place in the future cannot be added.");
 
   const filename = `${formatDate(new Date(1000 * data.start), "YYYY-MM")}.json`;
-  const file = createFile<SessionData[]>(
-    pathJoin(config.dataDirectory, filename)
-  );
+  const file = createFile(pathJoin(config.dataDirectory, filename));
 
-  const sessions = (await file.load()) || [];
+  const sessions: SessionData[] = (await file.load()) || [];
   const collidingSession = await findCollidingSession(session);
   if (collidingSession)
     return Err(

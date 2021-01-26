@@ -8,8 +8,19 @@ export type SessionDataInput = {
   project: string;
   start: string;
   end: string;
-  tags: string;
+  tags?: string;
 };
+
+export function isSessionDataInput(value: any): value is SessionDataInput {
+  return (
+    typeof value === "object" &&
+    Object.keys(value).length === 4 &&
+    typeof value.project === "string" &&
+    typeof value.start === "string" &&
+    typeof value.end === "string" &&
+    typeof value.tags === "string"
+  );
+}
 
 function errorOnNull<T>(name: string, value: T | null): Result<T, string> {
   return value ? Ok(value) : Err(name);
@@ -25,22 +36,22 @@ export function parseSessionData(
     errorOnNull("start", parseDate(input.start)),
     errorOnNull("end", parseDate(input.end))
   );
-  if (dateParseResult.ok) {
-    const tmp = dateParseResult.val;
-  }
 
   if (dateParseResult.err)
     return Err(
       `Invalid ${bold(dateParseResult.val)} value for the session's timespan.`
     );
 
-  const [start, end] = dateParseResult.val as Date[];
-  const tags = parseTags(input.tags);
+  const [start, end] = dateParseResult.val.map((date) =>
+    Math.floor(date.getTime() / 1000)
+  );
+
+  if (start > end) return Err("Session cannot start before it ends.");
 
   return Ok({
     project: projectParseResult.val,
-    start: Math.floor(start.getTime() / 1000),
-    end: Math.floor(end.getTime() / 1000),
-    tags: tags.length ? tags : undefined,
+    start,
+    end,
+    tags: input.tags ? parseTags(input.tags) : undefined,
   });
 }

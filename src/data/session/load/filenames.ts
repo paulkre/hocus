@@ -1,7 +1,10 @@
-import { readdirSync } from "fs";
+import { existsSync, readdirSync } from "fs";
+import mkdirp from "mkdirp";
 import { config } from "../../../config";
 
 export function getFilenames() {
+  if (!existsSync(config.dataDirectory)) mkdirp.sync(config.dataDirectory);
+
   return readdirSync(config.dataDirectory, {
     withFileTypes: true,
   })

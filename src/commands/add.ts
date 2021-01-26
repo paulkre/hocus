@@ -1,7 +1,8 @@
 import { createCommand } from "../command";
 import * as style from "../style";
 import { createSession, loadSessions, storeSession } from "../data/session";
-import { inquireSessionData } from "../inquiry/session-data";
+import { inquireSessionData } from "../input/inquiry/session-data";
+import { inquireProjectName } from "../input/inquiry/project-name";
 import { parseSessionData, SessionDataInput } from "../parsing/session-data";
 import { logError } from "../utils";
 
@@ -27,7 +28,7 @@ export function createAddCommand() {
 
         const [lastSession] = await loadSessions({ last: 1 });
         const input = await inquireSessionData(
-          { project: lastSession.project },
+          { project: lastSession && lastSession.project },
           existing
         );
 

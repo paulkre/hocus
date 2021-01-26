@@ -11,10 +11,12 @@ export async function renameProjectInSessions(
 ): Promise<Session[]> {
   const filenames = await getFilenames();
   const files = filenames.map((filename) =>
-    createFile<SessionData[]>(pathJoin(config.dataDirectory, filename))
+    createFile(pathJoin(config.dataDirectory, filename))
   );
 
-  const fileContents = await Promise.all(files.map((file) => file.load()));
+  const fileContents = (await Promise.all(
+    files.map((file) => file.load())
+  )) as SessionData[][];
 
   const editedData: SessionData[] = [];
   const editedContents = fileContents.map((data) => {

@@ -23,7 +23,7 @@ export function dateToTimeString(date: Date) {
 }
 
 export function dateToDateTimeString(date: Date) {
-  return style.date(formatDate(date, "YYYY-MM-DD HH:mm"));
+  return formatDate(date, "YYYY-MM-DD HH:mm");
 }
 
 export function dateToDayString(date: Date) {

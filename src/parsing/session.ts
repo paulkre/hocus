@@ -8,5 +8,5 @@ export async function parseSession(
   const session = await loadSingleSession(id);
   return session
     ? new Ok(session)
-    : new Err(`Session with ID ${bold(id)} could not be found.`);
+    : new Err(`Session with ID ${bold(id)} does not exist.`);
 }

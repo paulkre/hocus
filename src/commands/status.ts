@@ -20,7 +20,7 @@ export function createStatusCommand() {
       console.log(
         `Project ${style.project(state.project)} started ${getRelativeTime(
           date
-        )} (${dateToDateTimeString(date)})`
+        )} (${style.date(dateToDateTimeString(date))})`
       );
     });
 }

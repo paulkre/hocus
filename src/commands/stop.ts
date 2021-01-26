@@ -28,7 +28,7 @@ export async function runStopAction() {
   await clearCurrentSession();
   const date = new Date(1000 * currentSession.start);
   console.log(
-    `Stopping project ${style.project(
+    `Stopping session for project ${style.project(
       currentSession.project
     )} which was started ${getRelativeTime(date)}. ${style.id(
       `(ID: ${session.id})`

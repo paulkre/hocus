@@ -8,6 +8,7 @@
 - Support adding new sessions with `hocus add`
 - Support renaming projects with `hocus rename`
 - Support removing sessions by ID and by project name with `hocus remove ...`
+- Support for editing data with `vim`
 
 ### Changed
 
