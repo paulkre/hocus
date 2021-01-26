@@ -8,9 +8,9 @@ export async function removeSession({
   start,
 }: Session): Promise<Result<void, string>> {
   const file = createSessionFileFromDate(start);
-  const data = await file.load();
-
-  if (!data) return Err("Session could not be loaded from disk.");
+  const result = await file.load();
+  if (result.err) return Err(result.val);
+  const data = result.val;
 
   const foundIndex = data.findIndex((other) => other.localID === localID);
   if (foundIndex < 0) return Err("Session could not be found in data.");
@@ -29,16 +29,17 @@ export async function removeSessions(sessions: Session[]): Promise<void> {
   for (const { dateID, start } of sessions) {
     if (!dataCache.has(dateID)) {
       const file = createSessionFileFromDate(start);
-      dataCache.set(dateID, [file, await file.load()]);
+      const result = await file.load();
+      dataCache.set(dateID, [file, result.ok ? result.val : null]);
     }
   }
 
   for (const { dateID, localID } of sessions) {
     const [, data] = dataCache.get(dateID)!;
-    if (!data) return;
+    if (!data) continue;
 
     const foundIndex = data.findIndex((session) => session.localID === localID);
-    if (foundIndex < 0) return;
+    if (foundIndex < 0) continue;
 
     data.splice(foundIndex, 1);
   }

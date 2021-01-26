@@ -33,9 +33,9 @@ async function loadDataOfFirstFew(
   let data: SessionData[] = [];
   let i = 0;
   do {
-    const content = await createSessionFile(filenames[i]).load();
+    const result = await createSessionFile(filenames[i]).load();
     i++;
-    if (content) data = data.concat(content);
+    if (result.ok) data = data.concat(result.val);
   } while (data.length < first && i < filenames.length);
   return data;
 }
@@ -57,13 +57,13 @@ async function loadData({
 
   if (timespan) filenames = filterFilenamesByTimespan(filenames, timespan);
 
-  const fileContents = await Promise.all(
+  const results = await Promise.all(
     filenames.map((filename) => createSessionFile(filename).load())
   );
 
   let sessionData: SessionData[] = [];
-  fileContents.forEach((data) => {
-    if (data) sessionData = sessionData.concat(data);
+  results.forEach((result) => {
+    if (result.ok) sessionData = sessionData.concat(result.val);
   });
 
   if (timespan) sessionData = filterDataByTimespan(sessionData, timespan);

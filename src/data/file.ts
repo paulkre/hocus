@@ -1,13 +1,13 @@
+import { Result, Ok, Err } from "ts-results";
 import { dirname } from "path";
-import { existsSync, unlinkSync, renameSync, promises as fs } from "fs";
+import { existsSync, unlinkSync, copyFileSync, promises as fs } from "fs";
 import mkdirp from "mkdirp";
-import { logError } from "../utils";
-import chalk from "chalk";
+import { bold } from "../style";
 
 const { readFile, writeFile } = fs;
 
 export type File<T> = {
-  load(): Promise<T | null>;
+  load(): Promise<Result<T, string>>;
   store(value: T, pretty?: boolean): Promise<void>;
   delete(): void;
 };
@@ -20,26 +20,21 @@ export function createFile<T>(
 
   return {
     async load() {
-      if (existsSync(path)) {
-        const data = await readFile(path);
-        try {
-          const content = JSON.parse(data.toString());
-          if (!isType(content)) throw Error();
-          return content;
-        } catch {
-          logError(`File ${chalk.bold(path)} seems to be corrupted`);
-          const backupPath = `${path}.bak`;
-          renameSync(path, backupPath);
-          console.log(
-            `The corrupted file was moved to ${chalk.bold(
-              backupPath
-            )} (in case you want to try to recover it)`
-          );
-          console.log();
-        }
-      }
+      if (!existsSync(path)) return Err(`File ${bold(path)} does not exist.`);
 
-      return null;
+      const data = await readFile(path);
+      try {
+        const content = JSON.parse(data.toString());
+        if (!isType(content)) throw Error();
+        return Ok(content);
+      } catch {
+        const backupPath = `${path}.bak`;
+        copyFileSync(path, backupPath);
+        return Err(`File ${bold(path)} seems to be corrupted
+The corrupted file was copied to ${bold(
+          backupPath
+        )} (in case you want to try to recover it)`);
+      }
     },
 
     store(value, pretty) {

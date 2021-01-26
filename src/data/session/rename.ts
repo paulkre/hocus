@@ -1,3 +1,4 @@
+import { Result, Ok, Err } from "ts-results";
 import { getFilenames } from "./load/filenames";
 import { createSessionFile, createSessionFromData, SessionData } from "./data";
 import { Session } from "../../entities/session";
@@ -5,11 +6,17 @@ import { Session } from "../../entities/session";
 export async function renameProjectInSessions(
   projectName: string,
   newProjectName: string
-): Promise<Session[]> {
+): Promise<Result<Session[], string>> {
   const filenames = await getFilenames();
+  if (!filenames.length) return Ok([]);
   const files = filenames.map((filename) => createSessionFile(filename));
 
-  const fileContents = await Promise.all(files.map((file) => file.load()));
+  const result = Result.all(
+    ...(await Promise.all(files.map((file) => file.load())))
+  );
+  if (result.err) return Err(result.val);
+
+  const fileContents = result.val;
 
   const editedData: SessionData[] = [];
   const editedContents = fileContents.map((data) => {
@@ -37,5 +44,5 @@ export async function renameProjectInSessions(
     })
   );
 
-  return editedData.map((data) => createSessionFromData(data));
+  return Ok(editedData.map((data) => createSessionFromData(data)));
 }

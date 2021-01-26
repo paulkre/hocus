@@ -29,5 +29,5 @@ export async function inquireSession(): Promise<Result<Session, string>> {
   ]);
   console.log();
 
-  return new Ok((await loadSingleSession(id))!);
+  return loadSingleSession(id);
 }

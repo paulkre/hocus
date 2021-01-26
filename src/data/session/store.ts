@@ -50,7 +50,10 @@ Run ${chalk.bold("hocus cancel")} to stop the current session without saving.`
 
   const file = createSessionFileFromDate(session.start);
 
-  const data = (await file.load()) || [];
+  const result = await file.load();
+  if (result.err) return Err(result.val);
+  const data = result.val;
+
   const collidingSession = await findCollidingSession(session);
   if (collidingSession)
     return Err(

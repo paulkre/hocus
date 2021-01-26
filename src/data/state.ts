@@ -1,3 +1,4 @@
+import { Result, Ok, Err } from "ts-results";
 import { join as pathJoin } from "path";
 import { config } from "../config";
 import { createFile } from "./file";
@@ -48,8 +49,7 @@ const file = createFile<StateData>(
 );
 
 export async function loadState(): Promise<State> {
-  const data = await file.load();
-  return data ? createStateFromData(data) : {};
+  return createStateFromData((await file.load()).unwrapOr<StateData>({}));
 }
 
 export function storeState(state: State) {

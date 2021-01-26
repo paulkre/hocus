@@ -1,5 +1,5 @@
 import { createCommand } from "../../command";
-import { storeSession } from "../../data/session";
+import { loadSingleSession, storeSession } from "../../data/session";
 import * as style from "../../style";
 import {
   dateToDayString,
@@ -10,7 +10,6 @@ import {
 import { displayChanges } from "./display-changes";
 import { inquireSession } from "../../input/inquiry/session";
 import { parseSessionData } from "../../parsing/session-data";
-import { parseSessionID } from "../../parsing/session-id";
 import { requestSessionDataViaEditor } from "../../input/editor/session-data";
 
 export function createEditCommand() {
@@ -32,7 +31,9 @@ export function createEditCommand() {
       )} with the given ${style.bold("ID")}`
     )
     .action(async (id: string | undefined) => {
-      const sessionResult = await (id ? parseSessionID(id) : inquireSession());
+      const sessionResult = await (id
+        ? loadSingleSession(id)
+        : inquireSession());
 
       if (sessionResult.err) {
         logError(sessionResult.val);

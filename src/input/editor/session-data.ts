@@ -26,8 +26,8 @@ export async function requestSessionDataViaEditor(
 
   spawnSync(`vim ${filePath}`, [], { shell: true, stdio: "inherit" });
 
-  const modifiedData = await file.load();
+  const result = await file.load();
   file.delete();
 
-  return modifiedData ? Ok(modifiedData) : Err("Input format is invalid.");
+  return result;
 }
