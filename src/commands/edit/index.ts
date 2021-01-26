@@ -1,4 +1,3 @@
-import { Err, Ok, Result } from "ts-results";
 import { createCommand } from "../../command";
 import {
   loadSingleSession,
@@ -17,15 +16,9 @@ import {
 } from "../../utils";
 import { displayChanges } from "./display-changes";
 import { inquireSessionData } from "../../inquiry/session-data";
-import { inquireSession } from "./inquire-session";
+import { inquireSession } from "../../inquiry/session";
 import { parseSessionData, SessionDataInput } from "../../parsing/session-data";
-
-async function resolveSession(id: string): Promise<Result<Session, string>> {
-  const session = await loadSingleSession(id);
-  return session
-    ? new Ok(session)
-    : new Err(`Session with ID ${style.bold(id)} could not be found.`);
-}
+import { parseSession } from "../../parsing/session";
 
 export function createEditCommand() {
   return createCommand("edit")
@@ -61,9 +54,7 @@ export function createEditCommand() {
           return;
         }
 
-        const sessionResult = await (id
-          ? resolveSession(id)
-          : inquireSession());
+        const sessionResult = await (id ? parseSession(id) : inquireSession());
 
         if (sessionResult.err) {
           logError(sessionResult.val);

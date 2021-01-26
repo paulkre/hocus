@@ -1,9 +1,9 @@
 import { Result, Ok, Err } from "ts-results";
 import { prompt } from "inquirer";
-import { loadSessions, loadSingleSession } from "../../data/session";
-import { dateToDayString, dateToTimeString } from "../../utils";
-import * as style from "../../style";
-import { Session } from "../../data/session";
+import { loadSessions, loadSingleSession } from "../data/session";
+import { dateToDayString, dateToTimeString } from "../utils";
+import * as style from "../style";
+import { Session } from "../data/session";
 
 export async function inquireSession(): Promise<Result<Session, string>> {
   const latestSessions = await loadSessions({ last: 5 });
