@@ -10,6 +10,7 @@ import { parseFilter } from "../parsing/filter";
 import columnify from "columnify";
 import * as style from "../style";
 import { spawnSync } from "child_process";
+import { EOL } from "os";
 
 const dateToDayNum = (date: Date) => Math.floor(date.getTime() / 86_400_000);
 
@@ -101,7 +102,7 @@ export function createLogCommand() {
       );
 
       let output = "";
-      dayEntries.forEach(([day, sessions]) => {
+      dayEntries.forEach(([day, sessions], i) => {
         let dayTotalSeconds = 0;
         for (const { totalSeconds } of sessions)
           dayTotalSeconds += totalSeconds;
@@ -141,8 +142,7 @@ export function createLogCommand() {
 
         output += `${heading}
 ${table}
-
-`;
+${i < dayEntries.length - 1 ? EOL : ""}`;
       });
 
       if (options.raw) console.log(output);
