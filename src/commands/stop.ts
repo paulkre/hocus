@@ -1,6 +1,6 @@
 import { createCommand } from "../command";
 import { loadState, storeState } from "../data/state";
-import { saveSession } from "../data/session";
+import { saveSession } from "../data/sessions";
 import { getRelativeTime, logError } from "../utils";
 import { createSession } from "../entities/session";
 import * as style from "../style";

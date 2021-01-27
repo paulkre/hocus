@@ -1,5 +1,5 @@
 import { prompt } from "inquirer";
-import { querySessions } from "../../data/session";
+import { querySessions } from "../../data/sessions";
 
 export async function inquireProjectName(): Promise<string> {
   const [lastSession] = await querySessions({ last: 1 });

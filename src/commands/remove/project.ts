@@ -1,6 +1,6 @@
 import { prompt } from "inquirer";
 import { createCommand } from "../../command";
-import { querySessions, removeSessions } from "../../data/session";
+import { querySessions, removeSessions } from "../../data/sessions";
 import * as style from "../../style";
 
 export function createRemoveProjectCommand() {

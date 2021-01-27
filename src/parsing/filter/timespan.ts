@@ -1,6 +1,6 @@
 import { Result, Ok, Err } from "ts-results";
 import { parseDate } from "..";
-import { Timespan } from "../../data/session/query/timespan";
+import { Timespan } from "../../data/sessions/query/timespan";
 import { bold } from "../../style";
 
 export type TimespanInput = {

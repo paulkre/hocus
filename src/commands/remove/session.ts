@@ -1,5 +1,5 @@
 import { createCommand } from "../../command";
-import { findSingleSession, removeSession } from "../../data/session";
+import { findSingleSession, removeSession } from "../../data/sessions";
 import { inquireSession } from "../../input/inquiry/session";
 import * as style from "../../style";
 import { logError } from "../../utils";

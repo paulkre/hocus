@@ -1,6 +1,6 @@
 import { Result, Err } from "ts-results";
 import { prompt } from "inquirer";
-import { querySessions, findSingleSession } from "../../data/session";
+import { querySessions, findSingleSession } from "../../data/sessions";
 import { dateToDayString, dateToTimeString } from "../../utils";
 import * as style from "../../style";
 import { Session } from "../../entities/session";

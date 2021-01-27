@@ -1,6 +1,6 @@
 import { createCommand } from "../command";
 import { Session } from "../entities/session";
-import { querySessions } from "../data/session";
+import { querySessions } from "../data/sessions";
 import {
   dateToDayString,
   dateToTimeString,

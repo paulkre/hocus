@@ -1,5 +1,5 @@
 import { createCommand } from "../../command";
-import { findSingleSession, saveSession } from "../../data/session";
+import { findSingleSession, saveSession } from "../../data/sessions";
 import * as style from "../../style";
 import {
   dateToDayString,

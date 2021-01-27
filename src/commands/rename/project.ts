@@ -1,6 +1,6 @@
 import { createCommand } from "../../command";
 import * as style from "../../style";
-import { querySessions, renameProjectInSessions } from "../../data/session";
+import { querySessions, renameProjectInSessions } from "../../data/sessions";
 import { logError } from "../../utils";
 import { findProject } from "../../data/projects";
 import { createProject } from "../../entities/project";

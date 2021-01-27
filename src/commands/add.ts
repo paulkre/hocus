@@ -1,7 +1,7 @@
 import { createCommand } from "../command";
 import * as style from "../style";
 import { createSession } from "../entities/session";
-import { querySessions, saveSession } from "../data/session";
+import { querySessions, saveSession } from "../data/sessions";
 import { inquireSessionData } from "../input/inquiry/session-data";
 import { parseSessionData, SessionDataInput } from "../parsing/session-data";
 import { logError } from "../utils";
