@@ -1,8 +1,9 @@
-import { Result, Ok, Err } from "ts-results";
 import { join as pathJoin } from "path";
 import { config } from "../config";
 import { createFile } from "./file";
 import { State, StateSession } from "../entities/state";
+import { findProject } from "./projects";
+import { createProject } from "../entities/project";
 
 type StateSessionData = {
   project: string;
@@ -17,6 +18,7 @@ type StateData = {
 function serializeSessionState(props: StateSession): StateSessionData {
   return {
     ...props,
+    project: props.project.name,
     start: Math.floor(props.start.getTime() / 1000),
   };
 }
@@ -29,17 +31,22 @@ function serializeState(state: State): StateData {
   };
 }
 
-function createStateSessionFromData(data: StateSessionData): StateSession {
+async function createStateSessionFromData(
+  data: StateSessionData
+): Promise<StateSession> {
   return {
-    project: data.project,
+    project:
+      (await findProject(data.project)) ||
+      createProject({ name: data.project, count: 0 }),
     start: new Date(1000 * data.start),
   };
 }
 
-function createStateFromData(data: StateData): State {
+async function createStateFromData(data: StateData): Promise<State> {
   return {
-    currentSession:
-      data.currentSession && createStateSessionFromData(data.currentSession),
+    currentSession: data.currentSession
+      ? await createStateSessionFromData(data.currentSession)
+      : undefined,
   };
 }
 
@@ -49,7 +56,8 @@ const file = createFile<StateData>(
 );
 
 export async function loadState(): Promise<State> {
-  return createStateFromData((await file.load()).unwrapOr<StateData>({}));
+  const data = (await file.load()).unwrapOr<StateData>({});
+  return createStateFromData(data);
 }
 
 export function storeState(state: State) {

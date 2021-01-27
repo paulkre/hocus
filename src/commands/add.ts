@@ -1,7 +1,7 @@
 import { createCommand } from "../command";
 import * as style from "../style";
 import { createSession } from "../entities/session";
-import { loadSessions, storeSession } from "../data/session";
+import { querySessions, saveSession } from "../data/session";
 import { inquireSessionData } from "../input/inquiry/session-data";
 import { parseSessionData, SessionDataInput } from "../parsing/session-data";
 import { logError } from "../utils";
@@ -26,9 +26,9 @@ export function createAddCommand() {
         if (start) existing.push("start");
         if (end) existing.push("end");
 
-        const [lastSession] = await loadSessions({ last: 1 });
+        const [lastSession] = await querySessions({ last: 1 });
         const input = await inquireSessionData(
-          { project: lastSession && lastSession.project },
+          { project: lastSession && lastSession.project.name },
           existing
         );
 
@@ -43,7 +43,7 @@ export function createAddCommand() {
 
         const session = createSession(sessionDataParseResult.val);
 
-        const sessionStoreResult = await storeSession(session);
+        const sessionStoreResult = await saveSession(session);
         if (sessionStoreResult.err) {
           logError(sessionStoreResult.val);
           return;

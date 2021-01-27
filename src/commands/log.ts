@@ -1,6 +1,6 @@
 import { createCommand } from "../command";
 import { Session } from "../entities/session";
-import { loadSessions } from "../data/session";
+import { querySessions } from "../data/session";
 import {
   dateToDayString,
   dateToTimeString,
@@ -77,7 +77,7 @@ export function createLogCommand() {
         return;
       }
 
-      const sessions = await loadSessions(filterParseResult.val);
+      const sessions = await querySessions(filterParseResult.val);
 
       if (!sessions.length) {
         console.log("No data found.");
@@ -120,7 +120,9 @@ export function createLogCommand() {
               to: style.time(dateToTimeString(end)),
               duration: style.bold(durationToString(endSeconds - startSeconds)),
               project: style.project(
-                project.length > 20 ? `${project.slice(0, 19)}…` : project
+                project.name.length > 20
+                  ? `${project.name.slice(0, 19)}…`
+                  : project.name
               ),
               tags: tags
                 ? `[${tags.map((tag) => style.tag(tag)).join(", ")}]`

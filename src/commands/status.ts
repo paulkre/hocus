@@ -19,7 +19,7 @@ export function createStatusCommand() {
       const { project, start } = currentSession;
 
       console.log(
-        `Project ${style.project(project)} started ${getRelativeTime(
+        `Project ${style.project(project.name)} started ${getRelativeTime(
           start
         )} (${style.date(dateToDateTimeString(start))})`
       );

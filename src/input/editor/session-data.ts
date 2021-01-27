@@ -1,4 +1,4 @@
-import { Result, Ok, Err } from "ts-results";
+import { Result } from "ts-results";
 import { join as pathJoin } from "path";
 import { spawnSync } from "child_process";
 import { Session } from "../../entities/session";
@@ -17,7 +17,7 @@ export async function requestSessionDataViaEditor(
 
   const file = createFile<SessionDataInput>(filePath, isSessionDataInput);
   const unmodifiedInput: SessionDataInput = {
-    project: session.project,
+    project: session.project.name,
     start: dateToInputDefault(session.start),
     end: dateToInputDefault(session.end),
     tags: session.tags && session.tags.join(", "),
@@ -26,7 +26,7 @@ export async function requestSessionDataViaEditor(
 
   spawnSync(`vim ${filePath}`, [], { shell: true, stdio: "inherit" });
 
-  const result = await file.load();
+  const result = await file.load(true);
   file.delete();
 
   return result;

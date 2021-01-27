@@ -1,6 +1,5 @@
 import { createCommand } from "../../command";
-import { loadSingleSession } from "../../data/session";
-import { removeSession } from "../../data/session/remove";
+import { findSingleSession, removeSession } from "../../data/session";
 import { inquireSession } from "../../input/inquiry/session";
 import * as style from "../../style";
 import { logError } from "../../utils";
@@ -11,7 +10,7 @@ export function createRemoveSessionCommand() {
     .description(`Remove a ${style.session("session")}`)
     .action(async (id: string | undefined) => {
       const sessionResult = await (id
-        ? loadSingleSession(id)
+        ? findSingleSession(id)
         : inquireSession());
       if (sessionResult.err) {
         logError(sessionResult.val);

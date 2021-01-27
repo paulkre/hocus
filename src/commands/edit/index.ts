@@ -1,5 +1,5 @@
 import { createCommand } from "../../command";
-import { loadSingleSession, storeSession } from "../../data/session";
+import { findSingleSession, saveSession } from "../../data/session";
 import * as style from "../../style";
 import {
   dateToDayString,
@@ -32,7 +32,7 @@ export function createEditCommand() {
     )
     .action(async (id: string | undefined) => {
       const sessionResult = await (id
-        ? loadSingleSession(id)
+        ? findSingleSession(id)
         : inquireSession());
 
       if (sessionResult.err) {
@@ -44,11 +44,11 @@ export function createEditCommand() {
 
       console.log(`Editing session ${style.bold(session.id)}:`);
       console.log(
-        `Recorded for project ${style.project(session.project)} on ${style.date(
-          dateToDayString(session.start)
-        )} from ${style.time(dateToTimeString(session.start))} to ${style.time(
-          dateToTimeString(session.end)
-        )}${
+        `Recorded for project ${style.project(
+          session.project.name
+        )} on ${style.date(dateToDayString(session.start))} from ${style.time(
+          dateToTimeString(session.start)
+        )} to ${style.time(dateToTimeString(session.end))}${
           session.tags
             ? ` with tag${session.tags.length > 1 ? "s" : ""} ${humanizeTags(
                 session.tags
@@ -64,7 +64,9 @@ export function createEditCommand() {
         return;
       }
 
-      const sessionDataParseResult = parseSessionData(editorInputResult.val);
+      const sessionDataParseResult = await parseSessionData(
+        editorInputResult.val
+      );
 
       if (sessionDataParseResult.err) {
         logError(sessionDataParseResult.val);
@@ -78,9 +80,9 @@ export function createEditCommand() {
         return;
       }
 
-      const storeResult = await storeSession(editedSession);
-      if (storeResult.err) {
-        logError(storeResult.val);
+      const saveResult = await saveSession(editedSession);
+      if (saveResult.err) {
+        logError(saveResult.val);
         return;
       }
 

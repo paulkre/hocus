@@ -1,5 +1,5 @@
 import { Result, Ok, Err } from "ts-results";
-import { Filter } from "../../data/session/load";
+import { Filter } from "../../data/session";
 import { parseTimespan, TimespanInput } from "./timespan";
 import { parseTags } from "..";
 

@@ -1,5 +1,7 @@
+import { Project } from "./project";
+
 export type StateSession = {
-  project: string;
+  project: Project;
   start: Date;
   tags?: string[];
 };

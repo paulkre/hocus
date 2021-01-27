@@ -6,6 +6,8 @@ import { parseTags } from "../parsing";
 import { runStopAction } from "./stop";
 import * as style from "../style";
 import { inquireProjectName } from "../input/inquiry/project-name";
+import { findProject } from "../data/projects";
+import { createProject } from "../entities/project";
 
 type Options = {
   tags?: string[];
@@ -21,11 +23,16 @@ export function createStartCommand() {
       )} (comma or space separated)`
     )
     .description(`Start a new ${style.session("session")}`)
-    .action(async (project: string | undefined, opt: Options) => {
-      if (project) project = project.trim();
+    .action(async (projectName: string | undefined, opt: Options) => {
+      if (projectName) projectName = projectName.trim();
+      if (!projectName) projectName = await inquireProjectName();
+
+      const project =
+        (await findProject(projectName)) ||
+        createProject({ name: projectName, count: 0 });
+
       const tags = opt.tags && parseTags(opt.tags.join(" "));
 
-      if (!project) project = await inquireProjectName();
       if (!project) {
         logError("Project has to be specified.");
         return;
@@ -34,7 +41,9 @@ export function createStartCommand() {
       const { currentSession } = await loadState();
       if (currentSession) {
         console.log(
-          `Project ${style.project(currentSession.project)} already started.`
+          `Project ${style.project(
+            currentSession.project.name
+          )} already started.`
         );
         if (currentSession.project === project) return;
 
@@ -44,8 +53,8 @@ export function createStartCommand() {
               name: "stopCurrent",
               type: "confirm",
               message: `Do you want to stop ${style.project(
-                currentSession.project
-              )} and start ${style.project(project)}?`,
+                currentSession.project.name
+              )} and start ${style.project(project.name)}?`,
             },
           ]
         );
@@ -56,7 +65,7 @@ export function createStartCommand() {
 
       const start = new Date();
       console.log(
-        `Starting project ${style.project(project)}${
+        `Starting session for project ${style.project(project.name)}${
           tags ? ` with tags ${humanizeTags(tags)}` : ""
         } at ${style.time(dateToTimeString(start))}.`
       );

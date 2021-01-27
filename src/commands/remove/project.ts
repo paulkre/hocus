@@ -1,7 +1,6 @@
 import { prompt } from "inquirer";
 import { createCommand } from "../../command";
-import { loadSessions } from "../../data/session";
-import { removeSessions } from "../../data/session/remove";
+import { querySessions, removeSessions } from "../../data/session";
 import * as style from "../../style";
 
 export function createRemoveProjectCommand() {
@@ -9,7 +8,7 @@ export function createRemoveProjectCommand() {
     .arguments("<name>")
     .description(`Remove a ${style.project("project")}`)
     .action(async (project: string) => {
-      const sessions = await loadSessions({ project });
+      const sessions = await querySessions({ project });
 
       if (!sessions.length) {
         console.log(`No sessions found for project ${style.project(project)}.`);

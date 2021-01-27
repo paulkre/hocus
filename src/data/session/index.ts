@@ -1,2 +1,2 @@
-export * from "./store";
-export * from "./load";
+export * from "./mutate";
+export * from "./query";

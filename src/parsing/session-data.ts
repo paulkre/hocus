@@ -1,8 +1,9 @@
 import { Result, Ok, Err } from "ts-results";
-import { bold } from "../../style";
-import { SessionProps } from "../../entities/session";
-import { parseTags, parseDate } from "..";
-import { parseProject } from "./project";
+import { parseTags, parseDate, parseName } from ".";
+import { bold } from "../style";
+import { SessionProps } from "../entities/session";
+import { findProject } from "../data/projects";
+import { createProject } from "../entities/project";
 
 export type SessionDataInput = {
   project: string;
@@ -25,11 +26,14 @@ function errorOnNull<T>(name: string, value: T | null): Result<T, string> {
   return value ? Ok(value) : Err(name);
 }
 
-export function parseSessionData(
+export async function parseSessionData(
   input: SessionDataInput
-): Result<SessionProps, string> {
-  const projectParseResult = parseProject(input.project);
-  if (projectParseResult.err) return Err(projectParseResult.val);
+): Promise<Result<SessionProps, string>> {
+  const projectName = parseName(input.project);
+  if (!projectName)
+    return Err(`"${bold(input.project)}" is not valid project name.`);
+
+  const project = await findProject(projectName);
 
   const dateParseResult = Result.all<Result<Date, string>[]>(
     errorOnNull("start", parseDate(input.start)),
@@ -49,7 +53,12 @@ export function parseSessionData(
     return Err("Session cannot start before it ends.");
 
   return Ok({
-    project: projectParseResult.val,
+    project:
+      project ||
+      createProject({
+        name: projectName,
+        count: 0,
+      }),
     start: new Date(1000 * startSeconds),
     end: new Date(1000 * endSeconds),
     tags: input.tags ? parseTags(input.tags) : undefined,

@@ -1,12 +1,16 @@
 import { Session } from "../../../entities/session";
-import { createSessionFile, createSessionFromData, SessionData } from "../data";
+import {
+  getSessionsFile,
+  getSessionFilenames,
+  createSessionFromData,
+  SessionData,
+} from "../data";
 
 import {
   filterFilenamesByTimespan,
   filterDataByTimespan,
   Timespan,
 } from "./timespan";
-import { getFilenames } from "./filenames";
 
 export * from "./single";
 
@@ -33,7 +37,7 @@ async function loadDataOfFirstFew(
   let data: SessionData[] = [];
   let i = 0;
   do {
-    const result = await createSessionFile(filenames[i]).load();
+    const result = await getSessionsFile(filenames[i]).load();
     i++;
     if (result.ok) data = data.concat(result.val);
   } while (data.length < first && i < filenames.length);
@@ -47,7 +51,7 @@ async function loadData({
   last,
   tags,
 }: Filter): Promise<SessionData[]> {
-  let filenames = getFilenames();
+  let filenames = getSessionFilenames();
   if (!filenames.length) return [];
 
   if (first && !last && !timespan)
@@ -58,7 +62,7 @@ async function loadData({
   if (timespan) filenames = filterFilenamesByTimespan(filenames, timespan);
 
   const results = await Promise.all(
-    filenames.map((filename) => createSessionFile(filename).load())
+    filenames.map((filename) => getSessionsFile(filename).load())
   );
 
   let sessionData: SessionData[] = [];
@@ -78,8 +82,8 @@ async function loadData({
   return sessionData;
 }
 
-export async function loadSessions(filter: Filter): Promise<Session[]> {
-  return (await loadData(filter)).map((session) =>
-    createSessionFromData(session)
+export async function querySessions(filter: Filter): Promise<Session[]> {
+  return Promise.all(
+    (await loadData(filter)).map((session) => createSessionFromData(session))
   );
 }

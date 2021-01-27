@@ -1,12 +1,12 @@
-import { Result, Ok, Err } from "ts-results";
+import { Result, Err } from "ts-results";
 import { prompt } from "inquirer";
-import { loadSessions, loadSingleSession } from "../../data/session";
+import { querySessions, findSingleSession } from "../../data/session";
 import { dateToDayString, dateToTimeString } from "../../utils";
 import * as style from "../../style";
 import { Session } from "../../entities/session";
 
 export async function inquireSession(): Promise<Result<Session, string>> {
-  const latestSessions = await loadSessions({ last: 5 });
+  const latestSessions = await querySessions({ last: 5 });
 
   if (!latestSessions.length) return new Err("No sessions available to edit.");
 
@@ -21,7 +21,9 @@ export async function inquireSession(): Promise<Result<Session, string>> {
           value: id,
           name: `${style.bold(id)}: ${dateToDayString(start)} from ${style.bold(
             dateToTimeString(start)
-          )} to ${style.bold(dateToTimeString(end))} (${style.bold(project)})${
+          )} to ${style.bold(dateToTimeString(end))} (${style.bold(
+            project.name
+          )})${
             tags ? ` [${tags.map((tag) => style.bold(tag)).join(", ")}]` : ""
           }`,
         })),
@@ -29,5 +31,5 @@ export async function inquireSession(): Promise<Result<Session, string>> {
   ]);
   console.log();
 
-  return loadSingleSession(id);
+  return findSingleSession(id);
 }

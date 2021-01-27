@@ -1,6 +1,6 @@
-import { SESSION_MAX_DURATION, SessionData } from "../data";
+import { MAX_SESSION_DURATION, SessionData } from "../data";
 
-const maxDurationMs = 1000 * SESSION_MAX_DURATION;
+const maxDurationMs = 1000 * MAX_SESSION_DURATION;
 
 export type Timespan = {
   from: Date;

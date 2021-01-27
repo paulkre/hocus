@@ -5,11 +5,11 @@ import { dateToInputDefault } from "../../utils";
 
 export function displayChanges(session: Session, editedSession: Session) {
   const changes: [string, string, string][] = [];
-  if (session.project !== editedSession.project)
+  if (session.project.name !== editedSession.project.name)
     changes.push([
       "project",
-      session.project,
-      style.project(editedSession.project),
+      session.project.name,
+      style.project(editedSession.project.name),
     ]);
 
   if (session.startSeconds !== editedSession.startSeconds)

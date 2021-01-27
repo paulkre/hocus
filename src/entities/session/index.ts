@@ -1,10 +1,11 @@
 import { customAlphabet } from "nanoid";
+import { Project } from "../project";
 import { dateToID } from "./date";
 
 export { dateIDToDate } from "./date";
 
 export type SessionProps = {
-  project: string;
+  project: Project;
   start: Date;
   end: Date;
   tags?: string[];
@@ -46,7 +47,7 @@ export function createSession(props: SessionProps): Session {
       const tagsB = other.tags;
       return (
         id === other.id &&
-        props.project === other.project &&
+        props.project.name === other.project.name &&
         startSeconds === other.startSeconds &&
         endSeconds === other.endSeconds &&
         ((!tagsA && !tagsB) ||
