@@ -9,6 +9,7 @@
 - Support renaming projects with `hocus rename`
 - Support removing sessions by ID and by project name with `hocus remove ...`
 - Support for editing data with `vim`
+- Support for grouping projects in clients
 
 ### Changed
 

@@ -1,10 +1,10 @@
 import { Result, Ok, Err } from "ts-results";
 import {
-  createProjectData,
+  dataToProject,
   mutateProjects,
   saveProjectData,
   findProjectData,
-  ProjectData,
+  projectsFile,
 } from "./data";
 import { createProject, Project } from "../../entities/project";
 import { Session } from "../../entities/session";
@@ -23,24 +23,21 @@ export async function findProject(
     : findResult;
 }
 
-export async function saveProject(
-  project: Project,
-  sessions?: Session[]
+export async function updateProjects(
+  projects: Project[]
 ): Promise<Result<void, string>> {
-  if (!sessions || !sessions.length) {
-    const findResult = await findProjectData(project.name);
-    return findResult.ok && findResult.val
-      ? saveProjectData({
-          ...findResult.val,
-          ...project.serialize(),
-        })
-      : Err(
-          `Project ${bold(
-            project.name
-          )} could not be updated because it does not exist.`
-        );
-  }
-  return saveProjectData(createProjectData(project, sessions));
+  return mutateProjects((data) => {
+    projects.forEach((project) => {
+      const index = data.findIndex(({ name }) => name === project.name);
+      if (index < 0) return;
+      const unmodifiedData = data[index];
+      data.push({
+        ...unmodifiedData,
+        ...project.serialize(),
+      });
+    });
+    return data;
+  });
 }
 
 export async function deleteProject(
@@ -175,4 +172,17 @@ export async function handleAddedSession(
   session: Session
 ): Promise<Result<void, string>> {
   return handleAddedSessions([session], session.project);
+}
+
+export async function queryProjectsByClient(
+  clientName: string
+): Promise<Result<Project[], string>> {
+  const loadResult = await projectsFile.load();
+  return loadResult.ok
+    ? Ok(
+        loadResult.val
+          .filter(({ client }) => client === clientName)
+          .map((data) => dataToProject(data))
+      )
+    : loadResult;
 }

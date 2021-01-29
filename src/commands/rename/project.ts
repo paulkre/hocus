@@ -8,7 +8,6 @@ import {
   handleAddedSessions,
   handleRemovedSessions,
 } from "../../data/projects";
-import { createProject } from "../../entities/project";
 import { resolveProject } from "../../resolve/project";
 import { Result } from "ts-results";
 
