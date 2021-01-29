@@ -52,7 +52,8 @@ async function createStateFromData(data: StateData): Promise<State> {
 
 const file = getFile<StateData>(
   pathJoin(config.appDirectory, "state.json"),
-  (value): value is StateData => typeof value === "object"
+  (value): value is StateData => typeof value === "object",
+  {}
 );
 
 export async function loadState(): Promise<State> {

@@ -58,7 +58,8 @@ export function getSessionsFile(value: string | Session): File<SessionData[]> {
   return getFile<SessionData[]>(
     pathJoin(config.dataDirectory, filename),
     (value: any): value is SessionData[] =>
-      Array.isArray(value) && isSessionData(value[0])
+      Array.isArray(value) && isSessionData(value[0]),
+    []
   );
 }
 

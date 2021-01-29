@@ -14,7 +14,8 @@ export type File<T> = {
 
 function createFile<T>(
   path: string,
-  isType: (value: any) => value is T
+  isType: (value: any) => value is T,
+  defaultValue: T
 ): File<T> {
   const directory = dirname(path);
   let dataCache: T | null = null;
@@ -22,7 +23,7 @@ function createFile<T>(
   return {
     async load(ignoreCache) {
       if (dataCache && !ignoreCache) return Ok(dataCache);
-      if (!existsSync(path)) return Err(`File ${bold(path)} does not exist.`);
+      if (!existsSync(path)) return Ok(defaultValue);
 
       const rawData = await readFile(path);
       try {
@@ -56,11 +57,12 @@ The corrupted file was copied to ${bold(
 const fileCache = new Map<string, File<any>>();
 export function getFile<T>(
   path: string,
-  isType: (value: any) => value is T
+  isType: (value: any) => value is T,
+  defaultValue: T
 ): File<T> {
   const cachedFile = fileCache.get(path);
   if (cachedFile) return cachedFile;
-  const file = createFile<T>(path, isType);
+  const file = createFile<T>(path, isType, defaultValue);
   fileCache.set(path, file);
   return file;
 }
