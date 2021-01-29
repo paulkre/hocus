@@ -70,7 +70,7 @@ export function createEditCommand() {
         return;
       }
 
-      const editedSession = sessionDataParseResult.val;
+      const editedSession = session.modify(sessionDataParseResult.val);
 
       if (session.isIdenticalTo(editedSession)) {
         console.log("No changes were made.");

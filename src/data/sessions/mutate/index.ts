@@ -70,7 +70,12 @@ export async function updateSession(
 
   if (sessionBefore.project.name !== sessionAfter.project.name) {
     await handleRemovedSessions(sessionBefore.project);
-    await handleModifiedSession(sessionAfter);
+    await handleAddedSession(sessionAfter);
+  } else {
+    const { startSeconds: startBefore, endSeconds: endBefore } = sessionBefore;
+    const { startSeconds: startAfter, endSeconds: endAfter } = sessionAfter;
+    if (startBefore !== startAfter || endBefore !== endAfter)
+      await handleModifiedSession(sessionAfter);
   }
 
   return updateResult;

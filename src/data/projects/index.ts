@@ -4,12 +4,11 @@ import {
   mutateProjects,
   saveProjectData,
   findProjectData,
+  ProjectData,
 } from "./data";
-import { ProjectData } from "./data";
 import { createProject, Project } from "../../entities/project";
 import { Session } from "../../entities/session";
 import { querySessions } from "../sessions";
-import { SessionData } from "../sessions/data";
 import { querySessionData, Filter } from "../sessions/query/data";
 import { Timespan } from "../sessions/query/timespan";
 import { deleteSessionsUnsafe } from "../sessions";
@@ -57,49 +56,43 @@ export async function getSessionsForProject(
   });
 }
 
-function updateProjectTimespan(
-  projectData: ProjectData,
-  sessionData: SessionData[]
-) {
-  const earliestSession = sessionData[0];
-  const latestSession = sessionData[sessionData.length - 1];
-  return saveProjectData({
-    ...projectData,
-    sessionCount: sessionData.length,
-    timespan: [earliestSession.start, latestSession.end],
+function getSessionDataForProject(data: ProjectData) {
+  return querySessionData({
+    project: data.name,
+    timespan: resolveTimespan(data.timespan!),
   });
 }
 
 export async function handleRemovedSessions(project: Project) {
   const data = (await findProjectData(project.name))!;
-
-  const sessionData = await querySessionData({
-    project: data.name,
-    timespan: resolveTimespan(data.timespan!),
-  });
+  const sessionData = await getSessionDataForProject(data);
 
   if (!sessionData.length) return deleteProject(project);
 
-  return updateProjectTimespan(data, sessionData);
+  const earliestSession = sessionData[0];
+  const latestSession = sessionData[sessionData.length - 1];
+  return saveProjectData({
+    ...data,
+    sessionCount: sessionData.length,
+    timespan: [earliestSession.start, latestSession.end],
+  });
 }
 
 export async function handleModifiedSession(
   session: Session
 ): Promise<Result<void, string>> {
   const data = (await findProjectData(session.project.name))!;
-  const timespan = data.timespan!;
+  const sessionData = await getSessionDataForProject(data);
 
-  const sessionData = await querySessionData({
-    project: data.name,
-    timespan: {
-      from: new Date(
-        Math.min(session.start.getTime() - 1000, 1000 * timespan[0])
-      ),
-      to: new Date(Math.max(session.end.getTime() + 1000, 1000 * timespan[1])),
-    },
+  const earliestSession = sessionData[0];
+  const latestSession = sessionData[sessionData.length - 1];
+  return saveProjectData({
+    ...data,
+    timespan: [
+      Math.min(session.startSeconds, earliestSession.start),
+      Math.max(session.endSeconds, latestSession.end),
+    ],
   });
-
-  return updateProjectTimespan(data, sessionData);
 }
 
 export async function handleAddedSessions(

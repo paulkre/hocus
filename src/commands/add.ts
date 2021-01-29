@@ -1,5 +1,6 @@
 import { createCommand } from "../command";
 import * as style from "../style";
+import { createSession } from "../entities/session";
 import { insertSession } from "../data/sessions";
 import { inquireSessionData } from "../input/inquiry/session-data";
 import { parseSessionData } from "../parsing/session-data";
@@ -27,7 +28,7 @@ export function createAddCommand() {
           return;
         }
 
-        const session = sessionDataParseResult.val;
+        const session = createSession(sessionDataParseResult.val);
 
         const sessionInsertResult = await insertSession(session);
         if (sessionInsertResult.err) {

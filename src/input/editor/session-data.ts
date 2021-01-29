@@ -36,7 +36,7 @@ export async function requestSessionDataViaEditor(
     end: dateToInputDefault(session.end),
     tags: session.tags && session.tags.join(", "),
   };
-  await writeFile(filePath, JSON.stringify(unmodifiedInput));
+  await writeFile(filePath, JSON.stringify(unmodifiedInput, null, 1));
 
   spawnSync(`vim ${filePath}`, [], { shell: true, stdio: "inherit" });
 
