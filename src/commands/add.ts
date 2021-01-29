@@ -1,9 +1,8 @@
 import { createCommand } from "../command";
 import * as style from "../style";
-import { createSession } from "../entities/session";
-import { querySessions, saveSession } from "../data/sessions";
+import { insertSession } from "../data/sessions";
 import { inquireSessionData } from "../input/inquiry/session-data";
-import { parseSessionData, SessionDataInput } from "../parsing/session-data";
+import { parseSessionData } from "../parsing/session-data";
 import { logError } from "../utils";
 
 export function createAddCommand() {
@@ -12,40 +11,27 @@ export function createAddCommand() {
     .description(`Add a new ${style.bold("session")} with the given attributes`)
     .action(
       async (
-        project: string | undefined,
+        projectName: string | undefined,
         start: string | undefined,
         end: string | undefined
       ) => {
-        const cmdInput: Partial<SessionDataInput> = {
-          project,
+        const input = await inquireSessionData({
+          projectName,
           start,
           end,
-        };
-        const existing: string[] = [];
-        if (project) existing.push("project");
-        if (start) existing.push("start");
-        if (end) existing.push("end");
-
-        const [lastSession] = await querySessions({ last: 1 });
-        const input = await inquireSessionData(
-          { project: lastSession && lastSession.project.name },
-          existing
-        );
-
-        const sessionDataParseResult = await parseSessionData({
-          ...cmdInput,
-          ...input,
         });
+
+        const sessionDataParseResult = await parseSessionData(input);
         if (sessionDataParseResult.err) {
           logError(sessionDataParseResult.val);
           return;
         }
 
-        const session = createSession(sessionDataParseResult.val);
+        const session = sessionDataParseResult.val;
 
-        const sessionStoreResult = await saveSession(session);
-        if (sessionStoreResult.err) {
-          logError(sessionStoreResult.val);
+        const sessionInsertResult = await insertSession(session);
+        if (sessionInsertResult.err) {
+          logError(sessionInsertResult.val);
           return;
         }
 

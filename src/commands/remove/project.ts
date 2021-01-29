@@ -1,19 +1,25 @@
 import { prompt } from "inquirer";
 import { createCommand } from "../../command";
-import { querySessions, removeSessions } from "../../data/sessions";
+import {
+  deleteProject,
+  findProject,
+  getSessionsForProject,
+} from "../../data/projects";
 import * as style from "../../style";
 
 export function createRemoveProjectCommand() {
   return createCommand("project")
     .arguments("<name>")
     .description(`Remove a ${style.project("project")}`)
-    .action(async (project: string) => {
-      const sessions = await querySessions({ project });
+    .action(async (projectName: string) => {
+      const project = await findProject(projectName);
 
-      if (!sessions.length) {
-        console.log(`No sessions found for project ${style.project(project)}.`);
+      if (!project) {
+        console.log(`Project ${style.project(projectName)} does not exist.`);
         return;
       }
+
+      const sessions = await getSessionsForProject(project);
 
       const { confirmed } = await prompt<{ confirmed: boolean }>([
         {
@@ -28,11 +34,12 @@ export function createRemoveProjectCommand() {
       if (!confirmed) return;
       console.log();
 
-      await removeSessions(sessions);
+      await deleteProject(project);
+
       console.log(
         `Removed ${style.bold(sessions.length)} session${
           sessions.length > 1 ? "s" : ""
-        } of project ${style.project(project)}.`
+        } of project ${style.project(projectName)}.`
       );
     });
 }

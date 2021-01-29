@@ -12,7 +12,7 @@ export type File<T> = {
   delete(): void;
 };
 
-export function createFile<T>(
+function createFile<T>(
   path: string,
   isType: (value: any) => value is T
 ): File<T> {
@@ -51,4 +51,16 @@ The corrupted file was copied to ${bold(
       unlinkSync(path);
     },
   };
+}
+
+const fileCache = new Map<string, File<any>>();
+export function getFile<T>(
+  path: string,
+  isType: (value: any) => value is T
+): File<T> {
+  const cachedFile = fileCache.get(path);
+  if (cachedFile) return cachedFile;
+  const file = createFile<T>(path, isType);
+  fileCache.set(path, file);
+  return file;
 }

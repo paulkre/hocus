@@ -1,6 +1,5 @@
 import { createCommand } from "../../command";
-import { findSingleSession, saveSession } from "../../data/sessions";
-import * as style from "../../style";
+import { updateSession } from "../../data/sessions";
 import {
   dateToDayString,
   dateToTimeString,
@@ -8,9 +7,10 @@ import {
   humanizeTags,
 } from "../../utils";
 import { displayChanges } from "./display-changes";
-import { inquireSession } from "../../input/inquiry/session";
 import { parseSessionData } from "../../parsing/session-data";
 import { requestSessionDataViaEditor } from "../../input/editor/session-data";
+import { resolveSession } from "../../resolve/session";
+import * as style from "../../style";
 
 export function createEditCommand() {
   return createCommand("edit")
@@ -31,16 +31,13 @@ export function createEditCommand() {
       )} with the given ${style.bold("ID")}`
     )
     .action(async (id: string | undefined) => {
-      const sessionResult = await (id
-        ? findSingleSession(id)
-        : inquireSession());
-
-      if (sessionResult.err) {
-        logError(sessionResult.val);
+      const resolveResult = await resolveSession(id);
+      if (resolveResult.err) {
+        logError(resolveResult.val);
         return;
       }
 
-      const session = sessionResult.val;
+      const session = resolveResult.val;
 
       console.log(`Editing session ${style.bold(session.id)}:`);
       console.log(
@@ -73,14 +70,14 @@ export function createEditCommand() {
         return;
       }
 
-      const editedSession = session.modify(sessionDataParseResult.val);
+      const editedSession = sessionDataParseResult.val;
 
       if (session.isIdenticalTo(editedSession)) {
         console.log("No changes were made.");
         return;
       }
 
-      const saveResult = await saveSession(editedSession);
+      const saveResult = await updateSession(session, editedSession);
       if (saveResult.err) {
         logError(saveResult.val);
         return;

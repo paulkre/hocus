@@ -1,6 +1,6 @@
 import { createCommand } from "../command";
 import { loadState, storeState } from "../data/state";
-import { saveSession } from "../data/sessions";
+import { insertSession } from "../data/sessions";
 import { getRelativeTime, logError } from "../utils";
 import { createSession } from "../entities/session";
 import * as style from "../style";
@@ -9,7 +9,7 @@ export async function runStopAction() {
   const { currentSession } = await loadState();
 
   if (!currentSession) {
-    console.log("No project is currently being tracked.");
+    console.log("No session is currently running.");
     return;
   }
 
@@ -20,13 +20,14 @@ export async function runStopAction() {
     tags: currentSession.tags,
   });
 
-  const result = await saveSession(session);
+  const result = await insertSession(session);
   if (result.err) {
     logError(result.val);
     return;
   }
 
   await storeState({});
+
   console.log(
     `Stopping session for project ${style.project(
       currentSession.project.name

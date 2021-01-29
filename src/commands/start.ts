@@ -5,9 +5,7 @@ import { dateToTimeString, humanizeTags, logError } from "../utils";
 import { parseTags } from "../parsing";
 import { runStopAction } from "./stop";
 import * as style from "../style";
-import { inquireProjectName } from "../input/inquiry/project-name";
-import { findProject } from "../data/projects";
-import { createProject } from "../entities/project";
+import { resolveProject } from "../resolve/project";
 
 type Options = {
   tags?: string[];
@@ -24,19 +22,14 @@ export function createStartCommand() {
     )
     .description(`Start a new ${style.session("session")}`)
     .action(async (projectName: string | undefined, opt: Options) => {
-      if (projectName) projectName = projectName.trim();
-      if (!projectName) projectName = await inquireProjectName();
-
-      const project =
-        (await findProject(projectName)) ||
-        createProject({ name: projectName, count: 0 });
-
-      const tags = opt.tags && parseTags(opt.tags.join(" "));
-
-      if (!project) {
-        logError("Project has to be specified.");
+      const resolveResult = await resolveProject(projectName);
+      if (resolveResult.err) {
+        logError(resolveResult.val);
         return;
       }
+
+      const project = resolveResult.val;
+      const tags = opt.tags && parseTags(opt.tags.join(" "));
 
       const { currentSession } = await loadState();
       if (currentSession) {

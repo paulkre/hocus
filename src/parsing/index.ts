@@ -4,8 +4,8 @@ export function parseDate(value: string): Date | null {
   return chronoParse(value);
 }
 
-export function parseName(value: string): string | null {
-  return value.replace(/[^A-Za-z0-9-\.]+/, "").trim() || null;
+export function parseName(value: string): string | undefined {
+  return value.replace(/[^A-Za-z0-9-\.]+/, "").trim() || undefined;
 }
 
 export function parseTags(input: string): string[] | undefined {

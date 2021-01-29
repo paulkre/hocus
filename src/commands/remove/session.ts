@@ -1,29 +1,23 @@
 import { createCommand } from "../../command";
-import { findSingleSession, removeSession } from "../../data/sessions";
-import { inquireSession } from "../../input/inquiry/session";
+import { deleteSession } from "../../data/sessions";
 import * as style from "../../style";
 import { logError } from "../../utils";
+import { resolveSession } from "../../resolve/session";
 
 export function createRemoveSessionCommand() {
   return createCommand("session")
     .arguments("[id]")
     .description(`Remove a ${style.session("session")}`)
     .action(async (id: string | undefined) => {
-      const sessionResult = await (id
-        ? findSingleSession(id)
-        : inquireSession());
-      if (sessionResult.err) {
-        logError(sessionResult.val);
+      const resolveResult = await resolveSession(id);
+      if (resolveResult.err) {
+        logError(resolveResult.val);
         return;
       }
 
-      const session = sessionResult.val;
+      const session = resolveResult.val;
 
-      const removeResult = await removeSession(session);
-      if (removeResult.err) {
-        logError(removeResult.val);
-        return;
-      }
+      await deleteSession(session);
 
       console.log(
         `Session ${style.bold(session.id)} was removed successfully.`

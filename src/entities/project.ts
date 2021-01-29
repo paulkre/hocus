@@ -1,11 +1,11 @@
 export type ProjectProps = {
   name: string;
-  count: number;
   client?: string;
 };
 
 export type Project = ProjectProps & {
   modify(changes: Partial<Omit<ProjectProps, "name">>): Project;
+  serialize(): ProjectProps;
 };
 
 export function createProject(props: ProjectProps): Project {
@@ -16,5 +16,6 @@ export function createProject(props: ProjectProps): Project {
         ...props,
         ...changes,
       }),
+    serialize: () => ({ ...props }),
   };
 }

@@ -1,11 +1,13 @@
-import { Result, Err } from "ts-results";
+import { Result, Ok, Err } from "ts-results";
 import { prompt } from "inquirer";
-import { querySessions, findSingleSession } from "../../data/sessions";
+import { querySessions, findSession } from "../../data/sessions";
 import { dateToDayString, dateToTimeString } from "../../utils";
 import * as style from "../../style";
 import { Session } from "../../entities/session";
 
-export async function inquireSession(): Promise<Result<Session, string>> {
+export async function inquireSession(): Promise<
+  Result<Session | undefined, string>
+> {
   const latestSessions = await querySessions({ last: 5 });
 
   if (!latestSessions.length) return new Err("No sessions available to edit.");
@@ -31,5 +33,5 @@ export async function inquireSession(): Promise<Result<Session, string>> {
   ]);
   console.log();
 
-  return findSingleSession(id);
+  return Ok(await findSession(id));
 }

@@ -1,6 +1,6 @@
 import { join as pathJoin } from "path";
 import { config } from "../config";
-import { createFile } from "./file";
+import { getFile } from "./file";
 import { State, StateSession } from "../entities/state";
 import { findProject } from "./projects";
 import { createProject } from "../entities/project";
@@ -37,7 +37,7 @@ async function createStateSessionFromData(
   return {
     project:
       (await findProject(data.project)) ||
-      createProject({ name: data.project, count: 0 }),
+      createProject({ name: data.project }),
     start: new Date(1000 * data.start),
   };
 }
@@ -50,7 +50,7 @@ async function createStateFromData(data: StateData): Promise<State> {
   };
 }
 
-const file = createFile<StateData>(
+const file = getFile<StateData>(
   pathJoin(config.appDirectory, "state.json"),
   (value): value is StateData => typeof value === "object"
 );
