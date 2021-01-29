@@ -14,6 +14,7 @@ type YamlInput = {
 function isYamlInput(value: any): value is YamlInput {
   return (
     typeof value === "object" &&
+    typeof value.Project === "string" &&
     typeof value["Start-Date"] === "string" &&
     typeof value["End-Date"] === "string" &&
     (typeof value.Tags === "string" ||

@@ -3,7 +3,9 @@ import { parseTags, parseDate } from ".";
 import { bold } from "../style";
 import { SessionProps } from "../entities/session";
 import { MAX_SESSION_DURATION } from "../data/sessions/data";
-import { resolveProject } from "../resolve/project";
+import { findProject } from "../data/projects";
+import { createProject } from "../entities/project";
+import { parseName } from "../parsing";
 
 export type SessionDataInput = {
   projectName: string;
@@ -19,8 +21,11 @@ function errorOnNull<T>(name: string, value: T | null): Result<T, string> {
 export async function parseSessionData(
   input: SessionDataInput
 ): Promise<Result<SessionProps, string>> {
-  const resolveProjectResult = await resolveProject(input.projectName);
-  if (resolveProjectResult.err) return resolveProjectResult;
+  const projectName = parseName(input.projectName);
+  if (!projectName) return Err(`Invalid project name.`);
+
+  const findProjectResult = await findProject(projectName);
+  if (findProjectResult.err) return findProjectResult;
 
   const dateParseResult = Result.all<Result<Date, string>[]>(
     errorOnNull("start", parseDate(input.start)),
@@ -47,7 +52,7 @@ export async function parseSessionData(
     return Err("Sessions cannot take place in the future.");
 
   return Ok({
-    project: resolveProjectResult.val,
+    project: findProjectResult.val || createProject({ name: projectName }),
     start: new Date(1000 * startSeconds),
     end: new Date(1000 * endSeconds),
     tags: input.tags ? parseTags(input.tags) : undefined,

@@ -22,7 +22,5 @@ export async function requestEditViaEditor<T>(
   await unlink(filePath);
 
   const input = parse(data.toString());
-  return isType(input)
-    ? Ok(input)
-    : Err("Edited file has an incorrect format.");
+  return isType(input) ? Ok(input) : Err("File was not edited correctly.");
 }
