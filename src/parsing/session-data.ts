@@ -1,9 +1,7 @@
 import { Result, Ok, Err } from "ts-results";
-import { parseTags, parseDate, parseName } from ".";
+import { parseTags, parseDate } from ".";
 import { bold } from "../style";
 import { SessionProps } from "../entities/session";
-import { findProject } from "../data/projects";
-import { createProject } from "../entities/project";
 import { MAX_SESSION_DURATION } from "../data/sessions/data";
 import { resolveProject } from "../resolve/project";
 
@@ -11,18 +9,8 @@ export type SessionDataInput = {
   projectName: string;
   start: string;
   end: string;
-  tags?: string;
+  tags?: string | string[];
 };
-
-export function isSessionDataInput(value: any): value is SessionDataInput {
-  return (
-    typeof value === "object" &&
-    typeof value.projectName === "string" &&
-    typeof value.start === "string" &&
-    typeof value.end === "string" &&
-    (!value.tags || typeof value.tags === "string")
-  );
-}
 
 function errorOnNull<T>(name: string, value: T | null): Result<T, string> {
   return value ? Ok(value) : Err(name);
