@@ -1,7 +1,12 @@
 import inquirer from "inquirer";
 import { createCommand } from "../command";
 import { loadState, storeState } from "../data/state";
-import { dateToTimeString, humanizeTags, logError } from "../utils";
+import {
+  dateToTimeString,
+  getRelativeTime,
+  humanizeTags,
+  logError,
+} from "../utils";
 import { parseTags } from "../parsing";
 import { runStopAction } from "./stop";
 import * as style from "../style";
@@ -42,9 +47,11 @@ export function createStartCommand() {
         console.log(
           `Project ${style.project(
             currentSession.project.name
-          )} already started.`
+          )} was already started ${style.time(
+            getRelativeTime(currentSession.start)
+          )}.`
         );
-        if (currentSession.project === project) return;
+        if (currentSession.project.name === project.name) return;
 
         const { stopCurrent } = await inquirer.prompt<{ stopCurrent: boolean }>(
           [
