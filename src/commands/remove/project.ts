@@ -6,20 +6,31 @@ import {
   getSessionsForProject,
 } from "../../data/projects";
 import * as style from "../../style";
+import { logError } from "../../utils";
 
 export function createRemoveProjectCommand() {
   return createCommand("project")
     .arguments("<name>")
     .description(`Remove a ${style.project("project")}`)
     .action(async (projectName: string) => {
-      const project = await findProject(projectName);
+      const findResult = await findProject(projectName);
+      if (findResult.err) {
+        logError(findResult.val);
+        return;
+      }
+      const project = findResult.val;
 
       if (!project) {
         console.log(`Project ${style.project(projectName)} does not exist.`);
         return;
       }
 
-      const sessions = await getSessionsForProject(project);
+      const queryResult = await getSessionsForProject(project);
+      if (queryResult.err) {
+        logError(queryResult.val);
+        return;
+      }
+      const sessions = queryResult.val;
 
       const { confirmed } = await prompt<{ confirmed: boolean }>([
         {

@@ -1,3 +1,4 @@
+import { Result, Ok, Err } from "ts-results";
 import {
   dateToSessionFilename,
   getSessionsFile,
@@ -10,6 +11,7 @@ import {
   Timespan,
 } from "./timespan";
 import { dateIDToDate } from "../../../entities/session";
+import { bold } from "../../../style";
 
 export type Filter = {
   project?: string;
@@ -30,15 +32,16 @@ function filterDataByTags(data: SessionData[], tags: string[]) {
 async function loadDataOfFirstFew(
   filenames: string[],
   first: number
-): Promise<SessionData[]> {
+): Promise<Result<SessionData[], string>> {
   let data: SessionData[] = [];
   let i = 0;
   do {
     const result = await getSessionsFile(filenames[i]).load();
     i++;
-    if (result.ok) data = data.concat(result.val);
+    if (result.err) return result;
+    data = data.concat(result.val);
   } while (data.length < first && i < filenames.length);
-  return data;
+  return Ok(data);
 }
 
 export async function querySessionData({
@@ -47,25 +50,29 @@ export async function querySessionData({
   first,
   last,
   tags,
-}: Filter): Promise<SessionData[]> {
+}: Filter): Promise<Result<SessionData[], string>> {
   let filenames = getSessionFilenames();
-  if (!filenames.length) return [];
+  if (!filenames.length) return Ok([]);
 
-  if (first && !last && !timespan && !project)
-    return (await loadDataOfFirstFew(filenames, first)).slice(0, first);
-  if (last && !first && !timespan && !project)
-    return (await loadDataOfFirstFew(filenames.reverse(), last)).slice(-last);
+  if (first && !last && !timespan && !project) {
+    const result = await loadDataOfFirstFew(filenames, first);
+    return result.ok ? Ok(result.val.slice(0, first)) : result;
+  }
+  if (last && !first && !timespan && !project) {
+    const result = await loadDataOfFirstFew(filenames.reverse(), last);
+    return result.ok ? Ok(result.val.slice(-last)) : result;
+  }
 
   if (timespan) filenames = filterFilenamesByTimespan(filenames, timespan);
 
-  const results = await Promise.all(
-    filenames.map((filename) => getSessionsFile(filename).load())
+  const loadResult = Result.all(
+    ...(await Promise.all(
+      filenames.map((filename) => getSessionsFile(filename).load())
+    ))
   );
+  if (loadResult.err) return loadResult;
 
-  let sessionData: SessionData[] = [];
-  results.forEach((result) => {
-    if (result.ok) sessionData = sessionData.concat(result.val);
-  });
+  let sessionData = loadResult.val.flat();
 
   if (timespan) sessionData = filterDataByTimespan(sessionData, timespan);
 
@@ -78,23 +85,25 @@ export async function querySessionData({
     let slicedData: SessionData[] = [];
     if (first) slicedData = sessionData.slice(0, first);
     if (last) slicedData = [...slicedData, ...sessionData.slice(-last)];
-    return slicedData;
+    return Ok(slicedData);
   }
 
-  return sessionData;
+  return Ok(sessionData);
 }
 
 export async function findSessionData(
   id: string
-): Promise<SessionData | undefined> {
-  if (!id.match(/^[a-z0-9]{8}$/)) return undefined;
+): Promise<Result<SessionData | undefined, string>> {
+  if (!id.match(/^[a-z0-9]{8}$/))
+    return Err(`Provided ID ${bold(id)} is invalid.`);
   const dateID = id.slice(0, 3);
   const localID = id.slice(3, 8);
 
-  const result = await getSessionsFile(
+  const loadResult = await getSessionsFile(
     dateToSessionFilename(dateIDToDate(dateID))
   ).load();
-  if (result.err) return undefined;
 
-  return result.val.find((data) => data.localID === localID);
+  return loadResult.ok
+    ? Ok(loadResult.val.find((data) => data.localID === localID))
+    : loadResult;
 }

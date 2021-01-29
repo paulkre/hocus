@@ -36,8 +36,12 @@ export function createEditCommand() {
         logError(resolveResult.val);
         return;
       }
-
       const session = resolveResult.val;
+
+      if (!session) {
+        console.log("Session could not be found.");
+        return;
+      }
 
       console.log(`Editing session ${style.bold(session.id)}:`);
       console.log(

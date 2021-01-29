@@ -11,7 +11,8 @@ export async function resolveProject(
   projectName = parseName(projectName);
   if (!projectName) return Err(`Invalid project name.`);
 
-  return Ok(
-    (await findProject(projectName)) || createProject({ name: projectName })
-  );
+  const findResult = await findProject(projectName);
+  if (findResult.err) return findResult;
+
+  return Ok(findResult.val || createProject({ name: projectName }));
 }

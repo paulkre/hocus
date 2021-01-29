@@ -9,27 +9,50 @@ import {
   handleRemovedSessions,
 } from "../../data/projects";
 import { createProject } from "../../entities/project";
+import { resolveProject } from "../../resolve/project";
+import { Result } from "ts-results";
 
 export function createRenameProjectCommand() {
   return createCommand("project")
     .arguments("<name> <new-name>")
     .description(`Rename a ${style.project("project")}`)
     .action(async (projectName: string, newProjectName: string) => {
-      const project =
-        (await findProject(projectName)) ||
-        createProject({ name: projectName });
+      const findResult = await findProject(projectName);
+      if (findResult.err) {
+        logError(findResult.val);
+        return;
+      }
 
-      const sessions = await getSessionsForProject(project);
+      if (!findResult.val) {
+        console.log(
+          `Project ${style.project(
+            projectName
+          )} cannot be renamed because it does not exist.`
+        );
+        return;
+      }
+      const project = findResult.val;
+
+      const resolveTargetProjectResult = await resolveProject(newProjectName);
+      if (resolveTargetProjectResult.err) {
+        logError(resolveTargetProjectResult.val);
+        return;
+      }
+      const targetProject = resolveTargetProjectResult.val;
+
+      const queryResult = await getSessionsForProject(project);
+      if (queryResult.err) {
+        logError(queryResult.val);
+        return;
+      }
+      const sessions = queryResult.val;
+
       if (!sessions.length) {
         console.log(
           `No sessions found for project ${style.project(projectName)}.`
         );
         return;
       }
-
-      const targetProject =
-        (await findProject(newProjectName)) ||
-        createProject({ name: newProjectName });
 
       const renameResult = await updateSessionsUnsafe(
         sessions.map((session) =>
@@ -43,8 +66,14 @@ export function createRenameProjectCommand() {
         return;
       }
 
-      await handleAddedSessions(sessions, targetProject);
-      await handleRemovedSessions(project);
+      const cleanupResult = Result.all(
+        await handleRemovedSessions(project),
+        await handleAddedSessions(sessions, targetProject)
+      );
+      if (cleanupResult.err) {
+        logError(cleanupResult.val);
+        return;
+      }
 
       console.log(
         `Renamed project ${style.project(projectName)} to ${style.project(

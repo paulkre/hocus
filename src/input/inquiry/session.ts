@@ -8,7 +8,10 @@ import { Session } from "../../entities/session";
 export async function inquireSession(): Promise<
   Result<Session | undefined, string>
 > {
-  const latestSessions = await querySessions({ last: 5 });
+  const queryResult = await querySessions({ last: 5 });
+  if (queryResult.err) return queryResult;
+
+  const latestSessions = queryResult.val;
 
   if (!latestSessions.length) return new Err("No sessions available to edit.");
 
@@ -33,5 +36,5 @@ export async function inquireSession(): Promise<
   ]);
   console.log();
 
-  return Ok(await findSession(id));
+  return findSession(id);
 }

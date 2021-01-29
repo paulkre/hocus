@@ -6,7 +6,13 @@ import { createSession } from "../entities/session";
 import * as style from "../style";
 
 export async function runStopAction() {
-  const { currentSession } = await loadState();
+  const loadResult = await loadState();
+  if (loadResult.err) {
+    logError(loadResult.val);
+    return;
+  }
+
+  const { currentSession } = loadResult.val;
 
   if (!currentSession) {
     console.log("No session is currently running.");

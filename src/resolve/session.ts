@@ -5,14 +5,14 @@ import { inquireSession } from "../input/inquiry/session";
 
 export async function resolveSession(
   id?: string
-): Promise<Result<Session, string>> {
-  let session: Session | undefined;
-  if (id) session = await findSession(id);
-  else {
-    const inquireResult = await inquireSession();
-    if (inquireResult.err) return Err(inquireResult.val);
-    session = inquireResult.val;
+): Promise<Result<Session | undefined, string>> {
+  if (id) {
+    const findResult = await findSession(id);
+    if (findResult.err) return findResult;
+    return Ok(findResult.val);
   }
 
-  return session ? Ok(session) : Err(`Session could not be found.`);
+  const inquireResult = await inquireSession();
+  if (inquireResult.err) return Err(inquireResult.val);
+  return Ok(inquireResult.val);
 }

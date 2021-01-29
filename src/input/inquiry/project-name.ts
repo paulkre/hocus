@@ -1,8 +1,11 @@
 import { prompt } from "inquirer";
 import { querySessions } from "../../data/sessions";
+import { Session } from "../../entities/session";
 
 export async function inquireProjectName(): Promise<string> {
-  const [lastSession] = await querySessions({ last: 1 });
+  const [lastSession] = (await querySessions({ last: 1 })).unwrapOr<Session[]>(
+    []
+  );
   return (
     await prompt<{ project: string }>([
       {

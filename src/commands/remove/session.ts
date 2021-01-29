@@ -16,6 +16,10 @@ export function createRemoveSessionCommand() {
       }
 
       const session = resolveResult.val;
+      if (!session) {
+        console.log(`Session could not be found.`);
+        return;
+      }
 
       await deleteSession(session);
 

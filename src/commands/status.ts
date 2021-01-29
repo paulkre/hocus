@@ -1,6 +1,6 @@
 import { createCommand } from "../command";
 import { loadState } from "../data/state";
-import { getRelativeTime, dateToDateTimeString } from "../utils";
+import { getRelativeTime, dateToDateTimeString, logError } from "../utils";
 import * as style from "../style";
 
 export function createStatusCommand() {
@@ -9,7 +9,12 @@ export function createStatusCommand() {
       `Display the status of the current ${style.session("session")}`
     )
     .action(async () => {
-      const { currentSession } = await loadState();
+      const loadResult = await loadState();
+      if (loadResult.err) {
+        logError(loadResult.val);
+        return;
+      }
+      const { currentSession } = loadResult.val;
 
       if (!currentSession) {
         console.log("No project is currently being tracked.");

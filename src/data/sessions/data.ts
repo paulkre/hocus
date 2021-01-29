@@ -1,3 +1,4 @@
+import { Result, Ok } from "ts-results";
 import { join as pathJoin } from "path";
 import { existsSync, readdirSync } from "fs";
 import { format as formatDate } from "date-and-time";
@@ -38,15 +39,21 @@ export function serializeSession(v: Session): SessionData {
   };
 }
 
-export async function createSessionFromData(v: SessionData): Promise<Session> {
-  return createSession({
-    localID: v.localID,
-    project:
-      (await findProject(v.project)) || createProject({ name: v.project }),
-    start: new Date(1000 * v.start),
-    end: new Date(1000 * v.end),
-    tags: v.tags,
-  });
+export async function createSessionFromData(
+  v: SessionData
+): Promise<Result<Session, string>> {
+  const findResult = await findProject(v.project);
+  if (findResult.err) return findResult;
+
+  return Ok(
+    createSession({
+      localID: v.localID,
+      project: findResult.val || createProject({ name: v.project }),
+      start: new Date(1000 * v.start),
+      end: new Date(1000 * v.end),
+      tags: v.tags,
+    })
+  );
 }
 
 export const dateToSessionFilename = (date: Date) =>

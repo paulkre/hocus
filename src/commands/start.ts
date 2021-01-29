@@ -31,7 +31,13 @@ export function createStartCommand() {
       const project = resolveResult.val;
       const tags = opt.tags && parseTags(opt.tags.join(" "));
 
-      const { currentSession } = await loadState();
+      const loadResult = await loadState();
+      if (loadResult.err) {
+        logError(loadResult.val);
+        return;
+      }
+
+      const { currentSession } = loadResult.val;
       if (currentSession) {
         console.log(
           `Project ${style.project(

@@ -77,7 +77,12 @@ export function createLogCommand() {
         return;
       }
 
-      const sessions = await querySessions(filterParseResult.val);
+      const queryResult = await querySessions(filterParseResult.val);
+      if (queryResult.err) {
+        logError(queryResult.val);
+        return;
+      }
+      const sessions = queryResult.val;
 
       if (!sessions.length) {
         console.log("No data found.");

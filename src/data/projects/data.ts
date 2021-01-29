@@ -1,12 +1,13 @@
 import { Result, Ok, Err } from "ts-results";
 import { join as joinPaths } from "path";
+import { Session } from "../../entities/session";
 import { getFile } from "../file";
 import { config } from "../../config";
 import { createProject, Project, ProjectProps } from "../../entities/project";
 
 type ProjectDataProps = {
-  sessionCount?: number;
-  timespan?: [number, number];
+  sessionCount: number;
+  timespan: [number, number];
 };
 
 export type ProjectData = ProjectProps & ProjectDataProps;
@@ -19,13 +20,17 @@ export function dataToProject(data: ProjectData): Project {
   return createProject({ ...data });
 }
 
-export function projectToData(
+export function createProjectData(
   project: Project,
-  props?: ProjectDataProps
+  sessions: Session[]
 ): ProjectData {
   return {
     ...project.serialize(),
-    ...props,
+    sessionCount: sessions.length,
+    timespan: [
+      sessions[0].startSeconds,
+      sessions[sessions.length - 1].endSeconds,
+    ],
   };
 }
 
@@ -39,7 +44,9 @@ export const projectsFile = getFile<ProjectData[]>(
 export async function mutateProjects(
   mutateFn: (data: ProjectData[]) => ProjectData[]
 ): Promise<Result<void, string>> {
-  let data = await (await projectsFile.load()).unwrapOr<ProjectData[]>([]);
+  const loadResult = await projectsFile.load();
+  if (loadResult.err) return loadResult;
+  let data = loadResult.val;
 
   data = mutateFn(data);
 
@@ -65,7 +72,8 @@ export async function saveProjectData(
 
 export async function findProjectData(
   name: string
-): Promise<ProjectData | undefined> {
-  const projects = (await projectsFile.load()).unwrapOr<ProjectData[]>([]);
-  return projects.find((project) => project.name === name);
+): Promise<Result<ProjectData | undefined, string>> {
+  const loadResult = await projectsFile.load();
+  if (loadResult.err) return loadResult;
+  return Ok(loadResult.val.find((project) => project.name === name));
 }
