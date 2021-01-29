@@ -5,9 +5,7 @@ import * as style from "../style";
 
 export function createStatusCommand() {
   return createCommand("status")
-    .description(
-      `Display the status of the current ${style.session("session")}`
-    )
+    .description(`Display the status of the current ${style.bold("session")}`)
     .action(async () => {
       const loadResult = await loadState();
       if (loadResult.err) {

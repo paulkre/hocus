@@ -32,40 +32,38 @@ export function createLogCommand() {
   return createCommand("log")
     .option(
       "-f, --from <from>",
-      `The ${style.date(
+      `The ${style.bold(
         "date"
       )} from which the output should start including data`
     )
     .option(
       "-t, --to <to>",
-      `The ${style.date("date")} at which the output should stop including data`
+      `The ${style.bold("date")} at which the output should stop including data`
     )
     .option(
       "--first <first>",
-      `The number of ${style.session(
+      `The number of ${style.bold(
         "sessions"
       )} to include from the beginning of the selection`
     )
     .option(
       "--last <last>",
-      `The number of ${style.session(
+      `The number of ${style.bold(
         "sessions"
-      )} to include from the beginning of the selection`
+      )} to include from the end of the selection`
     )
     .option(
       "-T, --tags <tags...>",
-      `Only ${style.session("sessions")} with the specified ${style.tag(
-        "tags"
-      )} will be logged`
+      `The ${style.bold("tags")} every logged ${style.bold(
+        "session"
+      )} will have`
     )
     .option(
       "-r, --raw",
       "Output log directly to the terminal instead of passing it to the pager"
     )
     .description(
-      `Display each recorded ${style.project(
-        "session"
-      )} in the given ${style.time("timespan")}`
+      `Display each recorded ${style.bold("session")} in the given timespan`
     )
     .action(async (options: Options) => {
       const filterParseResult = parseFilter({

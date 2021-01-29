@@ -14,7 +14,7 @@ import { Result } from "ts-results";
 export function createRenameProjectCommand() {
   return createCommand("project")
     .arguments("<name> <new-name>")
-    .description(`Rename a ${style.project("project")}`)
+    .description(`Rename a ${style.bold("project")}`)
     .action(async (projectName: string, newProjectName: string) => {
       const findResult = await findProject(projectName);
       if (findResult.err) {

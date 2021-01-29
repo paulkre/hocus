@@ -26,7 +26,7 @@ export function createEditCommand() {
       "The new tags for the selected session (comma or space separated)"
     )
     .description(
-      `Modify the attributes of a ${style.project(
+      `Modify the attributes of a ${style.bold(
         "session"
       )} with the given ${style.bold("ID")}`
     )

@@ -6,7 +6,7 @@ import { createRemoveSessionCommand } from "./session";
 export function createRemoveCommand() {
   return createCommand("remove")
     .description(
-      `Remove a ${style.session("session")} or a ${style.project("project")}`
+      `Remove a ${style.bold("session")} or a ${style.bold("project")}`
     )
     .addCommand(createRemoveProjectCommand())
     .addCommand(createRemoveSessionCommand());

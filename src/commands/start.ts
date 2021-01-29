@@ -16,11 +16,11 @@ export function createStartCommand() {
     .arguments("[project]")
     .option(
       "-t, --tags <tags...>",
-      `${style.tag("Tags")} to be used on the started ${style.project(
+      `${style.bold("Tags")} to be used on the started ${style.bold(
         "session"
       )} (comma or space separated)`
     )
-    .description(`Start a new ${style.session("session")}`)
+    .description(`Start a new ${style.bold("session")}`)
     .action(async (projectName: string | undefined, opt: Options) => {
       const resolveResult = await resolveProject(projectName);
       if (resolveResult.err) {

@@ -11,7 +11,7 @@ import { logError } from "../../utils";
 export function createRemoveProjectCommand() {
   return createCommand("project")
     .arguments("<name>")
-    .description(`Remove a ${style.project("project")}`)
+    .description(`Remove a ${style.bold("project")}`)
     .action(async (projectName: string) => {
       const findResult = await findProject(projectName);
       if (findResult.err) {

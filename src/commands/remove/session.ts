@@ -7,7 +7,7 @@ import { resolveSession } from "../../resolve/session";
 export function createRemoveSessionCommand() {
   return createCommand("session")
     .arguments("[id]")
-    .description(`Remove a ${style.session("session")}`)
+    .description(`Remove a ${style.bold("session")}`)
     .action(async (id: string | undefined) => {
       const resolveResult = await resolveSession(id);
       if (resolveResult.err) {

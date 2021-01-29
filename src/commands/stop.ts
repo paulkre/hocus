@@ -45,6 +45,6 @@ export async function runStopAction() {
 
 export function createStopCommand() {
   return createCommand("stop")
-    .description(`Stop the current ${style.session("session")}`)
+    .description(`Stop the current ${style.bold("session")}`)
     .action(runStopAction);
 }

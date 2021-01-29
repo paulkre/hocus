@@ -6,7 +6,7 @@ import { queryProjectsByClient, updateProjects } from "../../data/projects";
 export function createRenameClientCommand() {
   return createCommand("client")
     .arguments("<name> <new-name>")
-    .description(`Rename a ${style.client("client")}`)
+    .description(`Rename a ${style.bold("client")}`)
     .action(async (clientName: string, newClientName: string) => {
       const queryResult = await queryProjectsByClient(clientName);
       if (queryResult.err) {
