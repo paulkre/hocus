@@ -11,6 +11,7 @@
 - Support for editing data with `vim`
 - Support for grouping projects in clients
 - Support for cancelling sessions with `hocus cancel`
+- Support for restarting the last session with `hocus restart`
 
 ### Changed
 

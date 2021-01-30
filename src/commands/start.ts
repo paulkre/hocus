@@ -10,12 +10,56 @@ import {
 import { parseTags } from "../parsing";
 import { runStopAction } from "./stop";
 import * as style from "../style";
+import { Project } from "../entities/project";
 import { resolveProject } from "../resolve/project";
+import { Ok, Result } from "ts-results";
 
 type Options = {
   tags?: string[];
   client?: string;
 };
+
+export async function startSession(
+  project: Project,
+  tags?: string[]
+): Promise<Result<void, string>> {
+  const loadResult = await loadState();
+  if (loadResult.err) return loadResult;
+
+  const { currentSession } = loadResult.val;
+  if (currentSession) {
+    console.log(
+      `Project ${style.project(
+        currentSession.project.name
+      )} was already started ${style.time(
+        getRelativeTime(currentSession.start)
+      )}.`
+    );
+    if (currentSession.project.name === project.name) return Ok(undefined);
+
+    const { stopCurrent } = await inquirer.prompt<{ stopCurrent: boolean }>([
+      {
+        name: "stopCurrent",
+        type: "confirm",
+        message: `Do you want to stop ${style.project(
+          currentSession.project.name
+        )} and start ${style.project(project.name)}?`,
+      },
+    ]);
+    if (!stopCurrent) return Ok(undefined);
+
+    return runStopAction();
+  }
+
+  const start = new Date();
+  console.log(
+    `Starting session for project ${style.project(project.name)}${
+      tags ? ` with tags ${humanizeTags(tags)}` : ""
+    } at ${style.time(dateToTimeString(start))}.`
+  );
+  await storeState({ currentSession: { project, start, tags } });
+  return Ok(undefined);
+}
 
 export function createStartCommand() {
   return createCommand("start")
@@ -34,48 +78,10 @@ export function createStartCommand() {
         return;
       }
 
-      const project = resolveResult.val;
-      const tags = opt.tags && parseTags(opt.tags);
-
-      const loadResult = await loadState();
-      if (loadResult.err) {
-        logError(loadResult.val);
-        return;
-      }
-
-      const { currentSession } = loadResult.val;
-      if (currentSession) {
-        console.log(
-          `Project ${style.project(
-            currentSession.project.name
-          )} was already started ${style.time(
-            getRelativeTime(currentSession.start)
-          )}.`
-        );
-        if (currentSession.project.name === project.name) return;
-
-        const { stopCurrent } = await inquirer.prompt<{ stopCurrent: boolean }>(
-          [
-            {
-              name: "stopCurrent",
-              type: "confirm",
-              message: `Do you want to stop ${style.project(
-                currentSession.project.name
-              )} and start ${style.project(project.name)}?`,
-            },
-          ]
-        );
-        if (!stopCurrent) return;
-
-        await runStopAction();
-      }
-
-      const start = new Date();
-      console.log(
-        `Starting session for project ${style.project(project.name)}${
-          tags ? ` with tags ${humanizeTags(tags)}` : ""
-        } at ${style.time(dateToTimeString(start))}.`
+      const startResult = await startSession(
+        resolveResult.val,
+        opt.tags && parseTags(opt.tags)
       );
-      return storeState({ currentSession: { project, start, tags } });
+      if (startResult.err) logError(startResult.val);
     });
 }

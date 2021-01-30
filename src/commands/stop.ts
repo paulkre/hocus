@@ -4,19 +4,17 @@ import { insertSession } from "../data/sessions";
 import { getRelativeTime, logError } from "../utils";
 import { createSession } from "../entities/session";
 import * as style from "../style";
+import { Ok, Result } from "ts-results";
 
-export async function runStopAction() {
+export async function runStopAction(): Promise<Result<void, string>> {
   const loadResult = await loadState();
-  if (loadResult.err) {
-    logError(loadResult.val);
-    return;
-  }
+  if (loadResult.err) return loadResult;
 
   const { currentSession } = loadResult.val;
 
   if (!currentSession) {
     console.log("No session is currently running.");
-    return;
+    return Ok(undefined);
   }
 
   const session = createSession({
@@ -27,10 +25,7 @@ export async function runStopAction() {
   });
 
   const result = await insertSession(session);
-  if (result.err) {
-    logError(result.val);
-    return;
-  }
+  if (result.err) return result;
 
   await storeState({});
 
@@ -41,10 +36,15 @@ export async function runStopAction() {
       `(ID: ${session.id})`
     )}`
   );
+
+  return Ok(undefined);
 }
 
 export function createStopCommand() {
   return createCommand("stop")
     .description(`Stop the current ${style.bold("session")}`)
-    .action(runStopAction);
+    .action(async () => {
+      const stopResult = await runStopAction();
+      if (stopResult.err) logError(stopResult.val);
+    });
 }
