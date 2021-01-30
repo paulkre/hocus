@@ -24,7 +24,7 @@ export function dataToProject(data: ProjectData): Project {
 export const projectsFile = getFile<ProjectData[]>(
   joinPaths(config.dataDirectory, "projects-000.json"),
   (value: any): value is ProjectData[] =>
-    Array.isArray(value) && isProjectData(value[0]),
+    Array.isArray(value) && (!value[0] || isProjectData(value[0])),
   []
 );
 
