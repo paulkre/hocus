@@ -1,13 +1,14 @@
 import { Result, Ok, Err } from "ts-results";
 import { join as joinPaths } from "path";
-import { Session } from "../../entities/session";
 import { getFile } from "../file";
 import { config } from "../../config";
 import { createProject, Project, ProjectProps } from "../../entities/project";
 
 type ProjectDataProps = {
-  sessionCount: number;
-  timespan: [number, number];
+  sessions?: {
+    count: number;
+    timespan: [number, number];
+  };
 };
 
 export type ProjectData = ProjectProps & ProjectDataProps;
@@ -18,20 +19,6 @@ export function isProjectData(value: any): value is ProjectData {
 
 export function dataToProject(data: ProjectData): Project {
   return createProject({ ...data });
-}
-
-export function createProjectData(
-  project: Project,
-  sessions: Session[]
-): ProjectData {
-  return {
-    ...project.serialize(),
-    sessionCount: sessions.length,
-    timespan: [
-      sessions[0].startSeconds,
-      sessions[sessions.length - 1].endSeconds,
-    ],
-  };
 }
 
 export const projectsFile = getFile<ProjectData[]>(

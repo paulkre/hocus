@@ -3,6 +3,7 @@ import * as style from "../../style";
 import { updateSessionsUnsafe } from "../../data/sessions";
 import { logError } from "../../utils";
 import {
+  deleteProject,
   findProject,
   getSessionsForProject,
   handleAddedSessions,
@@ -39,6 +40,13 @@ export function createRenameProjectCommand() {
       }
       const targetProject = resolveTargetProjectResult.val;
 
+      if (project.name === targetProject.name) {
+        console.log(
+          `Project ${style.project(project.name)} already has this name.`
+        );
+        return;
+      }
+
       const queryResult = await getSessionsForProject(project);
       if (queryResult.err) {
         logError(queryResult.val);
@@ -73,6 +81,8 @@ export function createRenameProjectCommand() {
         logError(cleanupResult.val);
         return;
       }
+
+      await deleteProject(project);
 
       console.log(
         `Renamed project ${style.project(projectName)} to ${style.project(

@@ -12,7 +12,6 @@ import { querySessions } from "../sessions";
 import { querySessionData, Filter } from "../sessions/query/data";
 import { Timespan } from "../sessions/query/timespan";
 import { deleteSessionsUnsafe } from "../sessions";
-import { bold } from "../../style";
 
 export async function findProject(
   name: string
@@ -68,11 +67,11 @@ export async function getSessionsForProject(
   const findResult = await findProjectData(project.name);
   if (findResult.err) return findResult;
 
-  return findResult.val
+  return findResult.val && findResult.val.sessions
     ? querySessions({
         ...filter,
         project: project.name,
-        timespan: resolveTimespan(findResult.val.timespan),
+        timespan: resolveTimespan(findResult.val.sessions.timespan),
       })
     : Ok([]);
 }
@@ -85,23 +84,31 @@ export async function handleRemovedSessions(
   if (!findResult.val)
     return Err("Failed to modify project data after removing sessions.");
   const data = findResult.val;
+  if (!data.sessions)
+    return Err("Failed to remove sessions from non-existent project.");
 
   const queryResult = await querySessionData({
     project: project.name,
-    timespan: resolveTimespan(data.timespan),
+    timespan: resolveTimespan(data.sessions.timespan),
   });
   if (queryResult.err) return queryResult;
 
   const sessionData = queryResult.val;
 
-  if (!sessionData.length) return deleteProject(project);
+  if (!sessionData.length)
+    return saveProjectData({
+      ...data,
+      sessions: undefined,
+    });
 
   const earliestSession = sessionData[0];
   const latestSession = sessionData[sessionData.length - 1];
   return saveProjectData({
     ...data,
-    sessionCount: sessionData.length,
-    timespan: [earliestSession.start, latestSession.end],
+    sessions: {
+      count: sessionData.length,
+      timespan: [earliestSession.start, latestSession.end],
+    },
   });
 }
 
@@ -112,16 +119,18 @@ export async function handleModifiedSession(
   if (findResult.err) return findResult;
   if (!findResult.val)
     return Err("Failed to update project data after editing session.");
-  const projectData = findResult.val;
+  const data = findResult.val;
+  if (!data.sessions)
+    return Err("Failed to update sessions of non-existent project.");
 
   const queryResult = await querySessionData({
-    project: projectData.name,
+    project: data.name,
     timespan: {
       from: new Date(
-        1000 * Math.min(projectData.timespan[0], session.startSeconds)
+        1000 * Math.min(data.sessions.timespan[0], session.startSeconds)
       ),
       to: new Date(
-        1000 * Math.max(projectData.timespan[1], session.endSeconds)
+        1000 * Math.max(data.sessions.timespan[1], session.endSeconds)
       ),
     },
   });
@@ -129,14 +138,20 @@ export async function handleModifiedSession(
 
   const sessionData = queryResult.val;
 
+  if (!sessionData.length)
+    return Err("Failed to modify sessions in project data.");
+
   const earliestSession = sessionData[0];
   const latestSession = sessionData[sessionData.length - 1];
   return saveProjectData({
-    ...projectData,
-    timespan: [
-      Math.min(session.startSeconds, earliestSession.start),
-      Math.max(session.endSeconds, latestSession.end),
-    ],
+    ...data,
+    sessions: {
+      count: sessionData.length,
+      timespan: [
+        Math.min(session.startSeconds, earliestSession.start),
+        Math.max(session.endSeconds, latestSession.end),
+      ],
+    },
   });
 }
 
@@ -153,18 +168,21 @@ export async function handleAddedSessions(
 
   let [{ startSeconds: from, endSeconds: to }] = sessions;
   if (sessions.length > 1) to = sessions[sessions.length - 1].endSeconds;
-  if (data) {
-    from = Math.min(from, data.timespan[0]);
-    to = Math.max(to, data.timespan[1]);
+  if (data?.sessions) {
+    from = Math.min(from, data.sessions.timespan[0]);
+    to = Math.max(to, data.sessions.timespan[1]);
   }
 
-  let sessionCount = sessions.length;
-  if (data) sessionCount += data.sessionCount;
+  let count = sessions.length;
+  if (data?.sessions) count += data.sessions.count;
 
   return saveProjectData({
     ...project.serialize(),
-    sessionCount,
-    timespan: [from, to],
+    ...data,
+    sessions: {
+      count,
+      timespan: [from, to],
+    },
   });
 }
 
