@@ -14,6 +14,7 @@ import { resolveProject } from "../resolve/project";
 
 type Options = {
   tags?: string[];
+  client?: string;
 };
 
 export function createStartCommand() {
@@ -21,7 +22,7 @@ export function createStartCommand() {
     .arguments("[project]")
     .option(
       "-t, --tags <tags...>",
-      `${style.bold("Tags")} to be used on the started ${style.bold(
+      `The ${style.bold("Tags")} to be used on the started ${style.bold(
         "session"
       )} (comma or space separated)`
     )
@@ -34,7 +35,7 @@ export function createStartCommand() {
       }
 
       const project = resolveResult.val;
-      const tags = opt.tags && parseTags(opt.tags.join(" "));
+      const tags = opt.tags && parseTags(opt.tags);
 
       const loadResult = await loadState();
       if (loadResult.err) {
