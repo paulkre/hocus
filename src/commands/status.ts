@@ -1,6 +1,6 @@
 import { createCommand } from "../command";
 import { loadState } from "../data/state";
-import { getRelativeTime, dateToDateTimeString, logError } from "../utils";
+import { getRelativeTime, logError } from "../utils";
 import * as style from "../style";
 
 export function createStatusCommand() {
@@ -24,9 +24,7 @@ export function createStatusCommand() {
       console.log(
         `Session for project ${style.project(
           project.name
-        )} started ${getRelativeTime(start)} (${style.date(
-          dateToDateTimeString(start)
-        )}).`
+        )} started ${getRelativeTime(start)}.`
       );
     });
 }

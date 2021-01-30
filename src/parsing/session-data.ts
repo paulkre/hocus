@@ -1,6 +1,5 @@
 import { Result, Ok, Err } from "ts-results";
 import { parseTags, parseDate } from ".";
-import { bold } from "../style";
 import { SessionProps } from "../entities/session";
 import { MAX_SESSION_DURATION } from "../data/sessions/data";
 import { findProject } from "../data/projects";
@@ -14,10 +13,6 @@ export type SessionDataInput = {
   tags?: string | string[];
 };
 
-function errorOnNull<T>(name: string, value: T | null): Result<T, string> {
-  return value ? Ok(value) : Err(name);
-}
-
 export async function parseSessionData(
   input: SessionDataInput
 ): Promise<Result<SessionProps, string>> {
@@ -27,17 +22,12 @@ export async function parseSessionData(
   const findProjectResult = await findProject(projectName);
   if (findProjectResult.err) return findProjectResult;
 
-  const dateParseResult = Result.all<Result<Date, string>[]>(
-    errorOnNull("start", parseDate(input.start)),
-    errorOnNull("end", parseDate(input.end))
-  );
+  const start = parseDate(input.start);
+  const end = parseDate(input.end);
 
-  if (dateParseResult.err)
-    return Err(
-      `Invalid ${bold(dateParseResult.val)} value for the session's timespan.`
-    );
+  if (!start || !end) return Err(`Invalid date / time value(s) provided.`);
 
-  const [startSeconds, endSeconds] = dateParseResult.val.map((date) =>
+  const [startSeconds, endSeconds] = [start, end].map((date) =>
     Math.floor(date.getTime() / 1000)
   );
 
@@ -53,8 +43,8 @@ export async function parseSessionData(
 
   return Ok({
     project: findProjectResult.val || createProject({ name: projectName }),
-    start: new Date(1000 * startSeconds),
-    end: new Date(1000 * endSeconds),
+    start,
+    end,
     tags: input.tags ? parseTags(input.tags) : undefined,
   });
 }

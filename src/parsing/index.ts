@@ -1,7 +1,7 @@
 import { parseDate as chronoParse } from "chrono-node";
 
-export function parseDate(value: string): Date | null {
-  return chronoParse(value);
+export function parseDate(value: string): Date | undefined {
+  return chronoParse(value) || undefined;
 }
 
 export function parseName(value: string): string | undefined {

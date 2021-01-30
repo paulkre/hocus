@@ -1,5 +1,9 @@
 import { Result, Ok } from "ts-results";
-import { createSessionFromData } from "../data";
+import {
+  createSessionFromData,
+  dateToSessionFilename,
+  getSessionsFile,
+} from "../data";
 import { querySessionData, findSessionData, Filter } from "./data";
 import { Session } from "../../../entities/session";
 
@@ -25,4 +29,17 @@ export async function findSession(
 
   const createResult = await createSessionFromData(findResult.val);
   return createResult.ok ? Ok(createResult.val) : createResult;
+}
+
+export async function findSessionByDate(
+  date: Date
+): Promise<Result<Session | undefined, string>> {
+  const file = getSessionsFile(dateToSessionFilename(date));
+  const loadResult = await file.load();
+  if (loadResult.err) return loadResult;
+  const seconds = Math.floor(date.getTime() / 1000);
+  const sessionData = loadResult.val.find(
+    (sessionData) => sessionData.start < seconds && sessionData.end > seconds
+  );
+  return sessionData ? createSessionFromData(sessionData) : Ok(undefined);
 }

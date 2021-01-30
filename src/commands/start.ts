@@ -7,21 +7,23 @@ import {
   humanizeTags,
   logError,
 } from "../utils";
-import { parseTags } from "../parsing";
+import { parseDate, parseTags } from "../parsing";
 import { runStopAction } from "./stop";
 import * as style from "../style";
 import { Project } from "../entities/project";
 import { resolveProject } from "../resolve/project";
 import { Ok, Result } from "ts-results";
+import { findSessionByDate } from "../data/sessions";
 
 type Options = {
   tags?: string[];
-  client?: string;
+  at?: string;
 };
 
 export async function startSession(
   project: Project,
-  tags?: string[]
+  tags?: string[],
+  start?: Date
 ): Promise<Result<void, string>> {
   const loadResult = await loadState();
   if (loadResult.err) return loadResult;
@@ -51,7 +53,7 @@ export async function startSession(
     return runStopAction();
   }
 
-  const start = new Date();
+  if (!start) start = new Date();
   console.log(
     `Starting session for project ${style.project(project.name)}${
       tags ? ` with tags ${humanizeTags(tags)}` : ""
@@ -65,6 +67,10 @@ export function createStartCommand() {
   return createCommand("start")
     .arguments("[project]")
     .option(
+      "--at <at>",
+      `Start the ${style.bold("session")} at this time / date`
+    )
+    .option(
       "-t, --tags <tags...>",
       `The ${style.bold("Tags")} to be used on the started ${style.bold(
         "session"
@@ -72,6 +78,30 @@ export function createStartCommand() {
     )
     .description(`Start a new ${style.bold("session")}`)
     .action(async (projectName: string | undefined, opt: Options) => {
+      const at = opt.at && parseDate(opt.at);
+      if (opt.at && !at) {
+        logError("Invalid start date / time provided.");
+        return;
+      }
+      if (at) {
+        if (at.getTime() > Date.now()) {
+          logError("Start date cannot be in the future.");
+          return;
+        }
+
+        const findResult = await findSessionByDate(at);
+        if (findResult.err) {
+          logError(findResult.val);
+          return;
+        }
+        if (findResult.val) {
+          logError(
+            "Start date is already covered by a previously saved session."
+          );
+          return;
+        }
+      }
+
       const resolveResult = await resolveProject(projectName);
       if (resolveResult.err) {
         logError(resolveResult.val);
@@ -80,7 +110,8 @@ export function createStartCommand() {
 
       const startResult = await startSession(
         resolveResult.val,
-        opt.tags && parseTags(opt.tags)
+        opt.tags && parseTags(opt.tags),
+        opt.at ? parseDate(opt.at) : undefined
       );
       if (startResult.err) logError(startResult.val);
     });

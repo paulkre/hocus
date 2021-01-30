@@ -1,12 +1,17 @@
+import { Err, Ok, Result } from "ts-results";
 import { createCommand } from "../command";
 import { loadState, storeState } from "../data/state";
 import { insertSession } from "../data/sessions";
 import { getRelativeTime, logError } from "../utils";
+import { parseDate } from "../parsing";
 import { createSession } from "../entities/session";
 import * as style from "../style";
-import { Ok, Result } from "ts-results";
 
-export async function runStopAction(): Promise<Result<void, string>> {
+type Options = {
+  at?: string;
+};
+
+export async function runStopAction(at?: Date): Promise<Result<void, string>> {
   const loadResult = await loadState();
   if (loadResult.err) return loadResult;
 
@@ -17,10 +22,13 @@ export async function runStopAction(): Promise<Result<void, string>> {
     return Ok(undefined);
   }
 
+  if (at && at.getTime() < currentSession.start.getTime())
+    return Err("The session's end date cannot be before its start date.");
+
   const session = createSession({
     project: currentSession.project,
     start: currentSession.start,
-    end: new Date(),
+    end: at || new Date(),
     tags: currentSession.tags,
   });
 
@@ -30,11 +38,11 @@ export async function runStopAction(): Promise<Result<void, string>> {
   await storeState({});
 
   console.log(
-    `Stopping session for project ${style.project(
+    `Saving session for project ${style.project(
       currentSession.project.name
-    )} which was started ${getRelativeTime(currentSession.start)}. ${style.id(
-      `(ID: ${session.id})`
-    )}`
+    )}, started ${getRelativeTime(currentSession.start)} and stopped ${
+      at ? getRelativeTime(at) : style.time("now")
+    }. ${style.id(`(ID: ${session.id})`)}`
   );
 
   return Ok(undefined);
@@ -42,9 +50,23 @@ export async function runStopAction(): Promise<Result<void, string>> {
 
 export function createStopCommand() {
   return createCommand("stop")
+    .option(
+      "--at <at>",
+      `Stop the ${style.bold("session")} at this time / date`
+    )
     .description(`Stop the current ${style.bold("session")}`)
-    .action(async () => {
-      const stopResult = await runStopAction();
+    .action(async (opt: Options) => {
+      const at = (opt.at && parseDate(opt.at)) || undefined;
+      if (opt.at && !at) {
+        logError("Invalid start date / time provided.");
+        return;
+      }
+      if (at && at.getTime() > Date.now()) {
+        logError("Stop date cannot be in the future.");
+        return;
+      }
+
+      const stopResult = await runStopAction(at);
       if (stopResult.err) logError(stopResult.val);
     });
 }
