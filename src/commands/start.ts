@@ -12,12 +12,13 @@ import { runStopAction } from "./stop";
 import * as style from "../style";
 import { Project } from "../entities/project";
 import { resolveProject } from "../resolve/project";
-import { Ok, Result } from "ts-results";
-import { findSessionByDate } from "../data/sessions";
+import { Err, Ok, Result } from "ts-results";
+import { findSessionByDate, querySessions } from "../data/sessions";
 
 type Options = {
   tags?: string[];
   at?: string;
+  gap: boolean;
 };
 
 export async function startSession(
@@ -63,6 +64,48 @@ export async function startSession(
   return Ok(undefined);
 }
 
+async function resolveStartDate(
+  options: Options
+): Promise<Result<Date | undefined, string>> {
+  if (options.at && !options.gap)
+    return Err(
+      `Flags ${style.bold("--at")} and ${style.bold(
+        "--no-gap"
+      )} cannot both be specified at the same.`
+    );
+
+  if (!options.gap) {
+    const queryResult = await querySessions({ last: 1 });
+    if (queryResult.err) return queryResult;
+    const [lastSession] = queryResult.val;
+    if (!lastSession) {
+      console.log(
+        `Flag ${style.bold(
+          "--no-gap"
+        )} has no effect because there are no previously recorded sessions.`
+      );
+      return Ok(undefined);
+    }
+    return Ok(lastSession.end);
+  }
+
+  const at = (options.at && parseDate(options.at)) || undefined;
+  if (options.at && !at) return Err("Invalid start date / time provided.");
+  if (at) {
+    if (at.getTime() > Date.now())
+      return Err("Start date cannot be in the future.");
+
+    const findResult = await findSessionByDate(at);
+    if (findResult.err) return Err(findResult.val);
+    if (findResult.val)
+      return Err(
+        "Start date is already covered by a previously saved session."
+      );
+  }
+
+  return Ok(at);
+}
+
 export function createStartCommand() {
   return createCommand("start")
     .arguments("[project]")
@@ -71,35 +114,21 @@ export function createStartCommand() {
       `Start the ${style.bold("session")} at this time / date`
     )
     .option(
+      "--no-gap",
+      `Start the ${style.bold("session")} with no gap between the last session`
+    )
+    .option(
       "-t, --tags <tags...>",
       `The ${style.bold("Tags")} to be used on the started ${style.bold(
         "session"
       )} (comma or space separated)`
     )
     .description(`Start a new ${style.bold("session")}`)
-    .action(async (projectName: string | undefined, opt: Options) => {
-      const at = opt.at && parseDate(opt.at);
-      if (opt.at && !at) {
-        logError("Invalid start date / time provided.");
+    .action(async (projectName: string | undefined, options: Options) => {
+      const resolveStartResult = await resolveStartDate(options);
+      if (resolveStartResult.err) {
+        logError(resolveStartResult.val);
         return;
-      }
-      if (at) {
-        if (at.getTime() > Date.now()) {
-          logError("Start date cannot be in the future.");
-          return;
-        }
-
-        const findResult = await findSessionByDate(at);
-        if (findResult.err) {
-          logError(findResult.val);
-          return;
-        }
-        if (findResult.val) {
-          logError(
-            "Start date is already covered by a previously saved session."
-          );
-          return;
-        }
       }
 
       const resolveResult = await resolveProject(projectName);
@@ -110,8 +139,8 @@ export function createStartCommand() {
 
       const startResult = await startSession(
         resolveResult.val,
-        opt.tags && parseTags(opt.tags),
-        opt.at ? parseDate(opt.at) : undefined
+        options.tags && parseTags(options.tags),
+        resolveStartResult.val
       );
       if (startResult.err) logError(startResult.val);
     });
