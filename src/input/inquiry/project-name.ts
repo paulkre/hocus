@@ -6,13 +6,13 @@ export async function inquireProjectName(): Promise<string> {
   const [lastSession] = (await querySessions({ last: 1 })).unwrapOr<Session[]>(
     []
   );
-  return (
-    await prompt<{ project: string }>([
-      {
-        name: "project",
-        message: "Project",
-        default: lastSession && lastSession.project.name,
-      },
-    ])
-  ).project;
+  const { project } = await prompt<{ project: string }>([
+    {
+      name: "project",
+      message: "Project",
+      default: lastSession && lastSession.project.name,
+    },
+  ]);
+  console.log();
+  return project;
 }

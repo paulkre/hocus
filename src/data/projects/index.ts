@@ -25,18 +25,23 @@ export async function findProject(
 export async function updateProjects(
   projects: Project[]
 ): Promise<Result<void, string>> {
-  return mutateProjects((data) => {
+  return mutateProjects((items) => {
     projects.forEach((project) => {
-      const index = data.findIndex(({ name }) => name === project.name);
+      const index = items.findIndex((item) => item.name === project.name);
       if (index < 0) return;
-      const unmodifiedData = data[index];
-      data.push({
+      const unmodifiedData = items[index];
+      items.splice(index, 1);
+      items.push({
         ...unmodifiedData,
         ...project.serialize(),
       });
     });
-    return data;
+    return items;
   });
+}
+
+export function updateProject(project: Project) {
+  return updateProjects([project]);
 }
 
 export async function deleteProject(

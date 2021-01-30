@@ -4,14 +4,14 @@ export type ProjectProps = {
 };
 
 export type Project = ProjectProps & {
-  modify(changes: Partial<Omit<ProjectProps, "name">>): Project;
+  mutate(changes: Partial<ProjectProps>): Project;
   serialize(): ProjectProps;
 };
 
 export function createProject(props: ProjectProps): Project {
   return {
     ...props,
-    modify: (changes) =>
+    mutate: (changes) =>
       createProject({
         ...props,
         ...changes,

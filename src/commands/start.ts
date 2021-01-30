@@ -10,7 +10,7 @@ import {
 import { parseDate, parseTags } from "../parsing";
 import { runStopAction } from "./stop";
 import * as style from "../style";
-import { Project } from "../entities/project";
+import { createProject, Project } from "../entities/project";
 import { resolveProject } from "../resolve/project";
 import { Err, Ok, Result } from "ts-results";
 import { findSessionByDate, querySessions } from "../data/sessions";

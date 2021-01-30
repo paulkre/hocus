@@ -1,4 +1,4 @@
-import { Result, Ok, Err } from "ts-results";
+import { Result, Ok } from "ts-results";
 import { join as joinPaths } from "path";
 import { getFile } from "../file";
 import { config } from "../../config";
