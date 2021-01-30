@@ -46,3 +46,6 @@ export function humanizeTags(tags: string[]): string {
 export function dateToInputDefault(date: Date) {
   return formatDate(date, "YYYY-MM-DD HH:mm:ss");
 }
+
+export const limitString = (value: string, length: number) =>
+  value.length > length ? `${value.slice(0, length - 1)}…` : value;

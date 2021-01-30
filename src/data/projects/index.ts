@@ -4,7 +4,7 @@ import {
   mutateProjects,
   saveProjectData,
   findProjectData,
-  projectsFile,
+  getProjectData,
 } from "./data";
 import { createProject, Project } from "../../entities/project";
 import { Session } from "../../entities/session";
@@ -200,7 +200,7 @@ export async function handleAddedSession(
 export async function queryProjectsByClient(
   clientName: string
 ): Promise<Result<Project[], string>> {
-  const loadResult = await projectsFile.load();
+  const loadResult = await getProjectData();
   return loadResult.ok
     ? Ok(
         loadResult.val

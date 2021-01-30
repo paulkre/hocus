@@ -6,12 +6,13 @@ import {
   dateToTimeString,
   durationToString,
   logError,
+  limitString,
 } from "../utils";
 import { parseFilter } from "../parsing/filter";
 import columnify from "columnify";
-import * as style from "../style";
-import { spawnSync } from "child_process";
 import { EOL } from "os";
+import { outputText } from "../output/text";
+import * as style from "../style";
 
 const dateToDayNum = (date: Date) => Math.floor(date.getTime() / 86_400_000);
 
@@ -22,13 +23,6 @@ type Options = {
   last?: string;
   tags?: string[];
 };
-
-function outputViaPager(text: string) {
-  spawnSync(`echo "${text}" | less -R`, [], { shell: true, stdio: "inherit" });
-}
-
-const limitString = (value: string, length: number) =>
-  value.length > length ? `${value.slice(0, length - 1)}…` : value;
 
 export function createLogCommand() {
   return createCommand("log")
@@ -150,7 +144,6 @@ ${table}
 ${i < dayEntries.length - 1 ? EOL : ""}`;
       });
 
-      if (output.split(EOL).length < 10) console.log(output);
-      else outputViaPager(output);
+      outputText(output);
     });
 }

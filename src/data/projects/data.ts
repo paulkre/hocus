@@ -21,7 +21,7 @@ export function dataToProject(data: ProjectData): Project {
   return createProject({ ...data });
 }
 
-export const projectsFile = getFile<ProjectData[]>(
+const projectsFile = getFile<ProjectData[]>(
   joinPaths(config.dataDirectory, "projects-000.json"),
   (value: any): value is ProjectData[] =>
     Array.isArray(value) && (!value[0] || isProjectData(value[0])),
@@ -69,4 +69,8 @@ export async function findProjectData(
   const loadResult = await projectsFile.load();
   if (loadResult.err) return loadResult;
   return Ok(loadResult.val.find((project) => project.name === name));
+}
+
+export function getProjectData(): Promise<Result<ProjectData[], string>> {
+  return projectsFile.load();
 }

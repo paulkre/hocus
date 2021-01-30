@@ -12,6 +12,7 @@
 - Support for grouping projects in clients
 - Support for cancelling sessions with `hocus cancel`
 - Support for restarting the last session with `hocus restart`
+- Support for listing all projects with `hocus projects`
 
 ### Changed
 
