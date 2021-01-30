@@ -21,7 +21,10 @@ export function run(argv: string[]) {
     .addCommand(createEditCommand())
     .addCommand(createAddCommand())
     .addCommand(createRenameCommand())
-    .addCommand(createRemoveCommand());
+    .addCommand(createRemoveCommand())
+    .action(async () => {
+      console.log(program.helpInformation());
+    });
 
   program.addHelpCommand("help [command]", "Display help for command");
 
