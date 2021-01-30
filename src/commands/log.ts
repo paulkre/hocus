@@ -21,12 +21,14 @@ type Options = {
   first?: string;
   last?: string;
   tags?: string[];
-  raw?: boolean;
 };
 
 function outputViaPager(text: string) {
   spawnSync(`echo "${text}" | less -R`, [], { shell: true, stdio: "inherit" });
 }
+
+const limitString = (value: string, length: number) =>
+  value.length > length ? `${value.slice(0, length - 1)}…` : value;
 
 export function createLogCommand() {
   return createCommand("log")
@@ -57,10 +59,6 @@ export function createLogCommand() {
       `The ${style.bold("tags")} every logged ${style.bold(
         "session"
       )} will have`
-    )
-    .option(
-      "-r, --raw",
-      "Output log directly to the terminal instead of passing it to the pager"
     )
     .description(
       `Display each recorded ${style.bold("session")} in the given timespan`
@@ -122,13 +120,14 @@ export function createLogCommand() {
               sep0: "to",
               to: style.time(dateToTimeString(end)),
               duration: style.bold(durationToString(endSeconds - startSeconds)),
-              project: style.project(
-                project.name.length > 20
-                  ? `${project.name.slice(0, 19)}…`
-                  : project.name
-              ),
+              project: style.project(limitString(project.name, 20)),
+              client: project.client
+                ? style.client(limitString(project.client, 10))
+                : "",
               tags: tags
-                ? `[${tags.map((tag) => style.tag(tag)).join(", ")}]`
+                ? `[${tags
+                    .map((tag) => style.tag(limitString(tag, 10)))
+                    .join(", ")}]`
                 : "",
             })
           ),
@@ -151,7 +150,7 @@ ${table}
 ${i < dayEntries.length - 1 ? EOL : ""}`;
       });
 
-      if (options.raw) console.log(output);
+      if (output.split(EOL).length < 10) console.log(output);
       else outputViaPager(output);
     });
 }
