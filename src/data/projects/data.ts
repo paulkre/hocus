@@ -39,7 +39,13 @@ export async function mutateProjects(
 
   if (data)
     await projectsFile.store(
-      data.sort((a, b) => a.name.localeCompare(b.name)),
+      data.sort((a, b) => {
+        if (a.sessions && b.sessions)
+          return a.sessions.timespan[1] - b.sessions.timespan[1];
+        if (a.sessions && !b.sessions) return 1;
+        if (!a.sessions && b.sessions) return -1;
+        return a.name.localeCompare(b.name);
+      }),
       true
     );
 
