@@ -48,7 +48,7 @@ export async function renameProject(
 
   const renameResult = await updateSessionsUnsafe(
     sessions.map((session) =>
-      session.modify({
+      session.mutate({
         project: targetProject,
       })
     )

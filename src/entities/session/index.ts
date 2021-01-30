@@ -19,7 +19,7 @@ export type Session = SessionProps & {
   startSeconds: number;
   endSeconds: number;
   isIdenticalTo(other: Session): boolean;
-  modify(changes: Partial<Omit<SessionProps, "localID">>): Session;
+  mutate(changes: Partial<Omit<SessionProps, "localID">>): Session;
 };
 
 const createRandomID = customAlphabet(
@@ -57,7 +57,7 @@ export function createSession(props: SessionProps): Session {
             tagsA.every((tag, i) => tag === tagsB[i])))
       );
     },
-    modify: (changes) =>
+    mutate: (changes) =>
       createSession({
         ...props,
         ...changes,

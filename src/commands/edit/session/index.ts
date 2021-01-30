@@ -36,7 +36,7 @@ export async function editSession(id?: string) {
     return;
   }
 
-  const editedSession = session.modify(sessionDataParseResult.val);
+  const editedSession = session.mutate(sessionDataParseResult.val);
 
   if (session.isIdenticalTo(editedSession)) {
     console.log("No changes were made.");
