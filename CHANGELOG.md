@@ -10,6 +10,7 @@
 - Support removing sessions by ID and by project name with `hocus remove ...`
 - Support for editing data with `vim`
 - Support for grouping projects in clients
+- Support for cancelling sessions with `hocus cancel`
 
 ### Changed
 

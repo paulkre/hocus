@@ -1,11 +1,11 @@
 import { createCommand } from "../command";
-import { loadState } from "../data/state";
-import { getRelativeTime, dateToDateTimeString, logError } from "../utils";
+import { loadState, storeState } from "../data/state";
+import { getRelativeTime, logError } from "../utils";
 import * as style from "../style";
 
-export function createStatusCommand() {
-  return createCommand("status")
-    .description(`Display the status of the current ${style.bold("session")}`)
+export function createCancelCommand() {
+  return createCommand("cancel")
+    .description(`Stop the current ${style.bold("session")} without saving it`)
     .action(async () => {
       const loadResult = await loadState();
       if (loadResult.err) {
@@ -21,12 +21,12 @@ export function createStatusCommand() {
 
       const { project, start } = currentSession;
 
+      await storeState({});
+
       console.log(
         `Session for project ${style.project(
           project.name
-        )} started ${getRelativeTime(start)} (${style.date(
-          dateToDateTimeString(start)
-        )}).`
+        )} which was started ${getRelativeTime(start)} is now cancelled.`
       );
     });
 }
