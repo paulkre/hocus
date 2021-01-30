@@ -42,7 +42,7 @@ export async function runStopAction(at?: Date): Promise<Result<void, string>> {
       currentSession.project.name
     )}, started ${getRelativeTime(currentSession.start)} and stopped ${
       at ? getRelativeTime(at) : style.time("now")
-    }. ${style.id(`(ID: ${session.id})`)}`
+    }. ${style.light(`(ID: ${session.id})`)}`
   );
 
   return Ok(undefined);

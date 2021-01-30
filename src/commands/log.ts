@@ -117,7 +117,7 @@ export function createLogCommand() {
         const table = columnify(
           sessions.map(
             ({ id, project, start, end, startSeconds, endSeconds, tags }) => ({
-              id: style.id(id),
+              id: style.light(id),
               from: style.time(dateToTimeString(start)),
               sep0: "to",
               to: style.time(dateToTimeString(end)),

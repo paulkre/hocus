@@ -1,7 +1,8 @@
+import { Result, Ok, Err } from "ts-results";
 import { createCommand } from "../../command";
-import { Result, Ok } from "ts-results";
 import * as style from "../../style";
 import { logError } from "../../utils";
+import { parseName } from "../../parsing";
 import { queryProjectsByClient, updateProjects } from "../../data/projects";
 
 export async function renameClient(
@@ -21,14 +22,22 @@ export async function renameClient(
     return Ok(undefined);
   }
 
+  const parsedNewName = parseName(newClientName);
+  if (!parsedNewName) return Err("New client name is invalid.");
+
+  if (clientName === parsedNewName) {
+    console.log(`Client ${style.client(clientName)} already has this name.`);
+    return Ok(undefined);
+  }
+
   const updateResult = await updateProjects(
-    projects.map((project) => project.mutate({ client: newClientName }))
+    projects.map((project) => project.mutate({ client: parsedNewName }))
   );
   if (updateResult.err) return updateResult;
 
   console.log(
-    `Renamed client ${style.bold(clientName)} to ${style.client(
-      newClientName
+    `Renamed client ${style.light(clientName)} to ${style.client(
+      parsedNewName
     )}.`
   );
 

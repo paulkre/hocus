@@ -30,7 +30,7 @@ export async function renameProject(
   const project = findResult.val;
 
   const parsedNewName = parseName(newProjectName);
-  if (!parsedNewName) return Err("New name is invalid.");
+  if (!parsedNewName) return Err("New project name is invalid.");
 
   if (project.name === parsedNewName) {
     console.log(
@@ -64,8 +64,8 @@ export async function renameProject(
   await deleteProject(project);
 
   console.log(
-    `Renamed project ${style.bold(projectName)} to ${style.project(
-      newProjectName
+    `Renamed project ${style.light(projectName)} to ${style.project(
+      parsedNewName
     )}.`
   );
 
