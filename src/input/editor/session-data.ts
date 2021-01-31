@@ -2,7 +2,7 @@ import { Ok, Result } from "ts-results";
 import { Session } from "../../entities/session";
 import { SessionDataInput } from "../../parsing/session-data";
 import { dateToInputDefault } from "../../utils";
-import { requestEditViaEditor } from "./editor";
+import { requestYamlEditViaEditor } from "./yaml";
 
 type YamlInput = {
   Project: string;
@@ -34,7 +34,7 @@ export async function requestSessionDataViaEditor(
     Tags: session.tags || [],
   };
 
-  const inputResult = await requestEditViaEditor<YamlInput>(
+  const inputResult = await requestYamlEditViaEditor<YamlInput>(
     session.id,
     baseInput,
     isYamlInput

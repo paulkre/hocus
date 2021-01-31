@@ -12,6 +12,7 @@ import { createCancelCommand } from "./commands/cancel";
 import { createRestartCommand } from "./commands/restart";
 import { createProjectsCommand } from "./commands/projects";
 import { createReportCommand } from "./commands/report";
+import { createNoteCommand } from "./commands/note";
 
 import pkg from "../package.json";
 
@@ -30,6 +31,7 @@ export function run(argv: string[]) {
     .addCommand(createRestartCommand())
     .addCommand(createProjectsCommand())
     .addCommand(createReportCommand())
+    .addCommand(createNoteCommand())
     .action(async () => {
       console.log(program.helpInformation());
     });

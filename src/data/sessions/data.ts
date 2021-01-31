@@ -17,6 +17,7 @@ export type SessionData = {
   start: number;
   end: number;
   tags?: string[];
+  notes?: string;
 };
 
 function isSessionData(value: any): value is SessionData {
@@ -29,17 +30,18 @@ function isSessionData(value: any): value is SessionData {
   );
 }
 
-export function serializeSession(v: Session): SessionData {
+export function sessionToData(v: Session): SessionData {
   return {
     localID: v.localID,
     project: v.project.name,
     start: v.startSeconds,
     end: v.endSeconds,
     tags: v.tags,
+    notes: v.notes,
   };
 }
 
-export async function createSessionFromData(
+export async function dataToSession(
   v: SessionData
 ): Promise<Result<Session, string>> {
   const findResult = await findProject(v.project);
@@ -52,6 +54,7 @@ export async function createSessionFromData(
       start: new Date(1000 * v.start),
       end: new Date(1000 * v.end),
       tags: v.tags,
+      notes: v.notes,
     })
   );
 }

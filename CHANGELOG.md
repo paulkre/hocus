@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- Support for adding notes to sessions with `hocus note [id]`
+
 ## [2.1.0] - 2021-01-31
 
 ### Added

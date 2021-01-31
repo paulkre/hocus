@@ -1,6 +1,6 @@
 import { Result, Ok, Err } from "ts-results";
 import { Session } from "../../../entities/session";
-import { serializeSession } from "../data";
+import { sessionToData } from "../data";
 import { mutateSessions } from "./data";
 import { querySessionData } from "../query/data";
 import {
@@ -45,7 +45,7 @@ export async function updateSessionsUnsafe(
     sessionsInFile.forEach((session) => {
       const index = items.findIndex((data) => data.localID === session.localID);
       if (index >= 0) items.splice(index, 1);
-      items.push(serializeSession(session));
+      items.push(sessionToData(session));
     });
     return items;
   });
@@ -64,7 +64,7 @@ export async function updateSession(
     );
     if (index < 0) return null;
     items.splice(index, 1);
-    items.push(serializeSession(sessionAfter));
+    items.push(sessionToData(sessionAfter));
     return items;
   });
 
@@ -88,7 +88,7 @@ export async function insertSession(
   if (validation.err) return validation;
 
   const updateResult = await mutateSessions([session], (items) => {
-    items.push(serializeSession(session));
+    items.push(sessionToData(session));
     return items;
   });
 

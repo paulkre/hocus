@@ -10,6 +10,7 @@ type StateSessionData = {
   project: string;
   start: number;
   tags?: string[];
+  notes?: string;
 };
 
 type StateData = {
@@ -39,6 +40,7 @@ async function createStateSessionFromData(
 
   return findResult.ok
     ? Ok({
+        ...data,
         project: findResult.val || createProject({ name: data.project }),
         start: new Date(1000 * data.start),
       })
@@ -56,7 +58,7 @@ async function createStateFromData(
     currentSession = createResult.val;
   }
 
-  return Ok({ currentSession });
+  return Ok({ ...data, currentSession });
 }
 
 const file = getFile<StateData>(

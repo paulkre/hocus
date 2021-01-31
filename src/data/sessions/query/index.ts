@@ -1,9 +1,5 @@
 import { Result, Ok } from "ts-results";
-import {
-  createSessionFromData,
-  dateToSessionFilename,
-  getSessionsFile,
-} from "../data";
+import { dataToSession, dateToSessionFilename, getSessionsFile } from "../data";
 import { querySessionData, findSessionData, Filter } from "./data";
 import { Session } from "../../../entities/session";
 
@@ -14,7 +10,7 @@ export async function querySessions(
   return queryResult.ok
     ? Result.all(
         ...(await Promise.all(
-          queryResult.val.map((session) => createSessionFromData(session))
+          queryResult.val.map((session) => dataToSession(session))
         ))
       )
     : queryResult;
@@ -27,7 +23,7 @@ export async function findSession(
   if (findResult.err) return findResult;
   if (!findResult.val) return Ok(undefined);
 
-  const createResult = await createSessionFromData(findResult.val);
+  const createResult = await dataToSession(findResult.val);
   return createResult.ok ? Ok(createResult.val) : createResult;
 }
 
@@ -41,5 +37,5 @@ export async function findSessionByDate(
   const sessionData = loadResult.val.find(
     (sessionData) => sessionData.start < seconds && sessionData.end > seconds
   );
-  return sessionData ? createSessionFromData(sessionData) : Ok(undefined);
+  return sessionData ? dataToSession(sessionData) : Ok(undefined);
 }

@@ -9,6 +9,7 @@ export type SessionProps = {
   start: Date;
   end: Date;
   tags?: string[];
+  notes?: string;
   localID?: string;
 };
 

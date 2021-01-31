@@ -1,7 +1,7 @@
 import { Ok, Result } from "ts-results";
 import { Project } from "../../entities/project";
 import { ProjectInput } from "../../parsing/project";
-import { requestEditViaEditor } from "./editor";
+import { requestYamlEditViaEditor } from "./yaml";
 
 type YamlInput = {
   Name: string;
@@ -24,7 +24,7 @@ export async function editProjectViaEditor(
     Client: project.client || "",
   };
 
-  const inputResult = await requestEditViaEditor<YamlInput>(
+  const inputResult = await requestYamlEditViaEditor<YamlInput>(
     project.name,
     baseInput,
     isYamlInput

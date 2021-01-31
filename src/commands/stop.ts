@@ -26,6 +26,7 @@ export async function runStopAction(at?: Date): Promise<Result<void, string>> {
     return Err("The session's end date cannot be before its start date.");
 
   const session = createSession({
+    ...currentSession,
     project: currentSession.project,
     start: currentSession.start,
     end: at || new Date(),
