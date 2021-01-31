@@ -20,7 +20,7 @@ import {
 } from "../../projects/data";
 
 export type Filter = {
-  [key: string]: string | string[] | Timespan | number | Project | undefined;
+  [key: string]: any;
   project?: Project;
   timespan?: Timespan;
   first?: number;

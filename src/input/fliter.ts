@@ -9,6 +9,7 @@ export type FilterOptions = {
   last?: string;
   tags?: string[];
   client?: string;
+  all?: boolean;
 };
 
 export function wrapCommandWithFilterOptions(
@@ -52,5 +53,11 @@ export function wrapCommandWithFilterOptions(
     .option(
       "-c, --client <client>",
       `The client name every included ${style.bold("session")} must have`
+    )
+    .option(
+      "-a, --all",
+      `Override the default timespan of one week to query all ${style.bold(
+        "sessions"
+      )}`
     );
 }
