@@ -17,7 +17,8 @@ function isYamlInput(value: any): value is YamlInput {
     typeof value.Project === "string" &&
     typeof value["Start-Date"] === "string" &&
     typeof value["End-Date"] === "string" &&
-    (typeof value.Tags === "string" ||
+    (!value.Tags ||
+      typeof value.Tags === "string" ||
       (Array.isArray(value.Tags) &&
         value.Tags.every((tag: any) => typeof tag === "string")))
   );

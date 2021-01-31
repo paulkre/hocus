@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- Bug fixed preventing removal of tags in edit mode
+
 ## [2.0.0] - 2021-01-31
 
 ### Added
