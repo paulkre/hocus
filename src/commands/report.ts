@@ -6,12 +6,9 @@ import { wrapCommandWithFilterOptions, FilterOptions } from "../input/fliter";
 import { resolveFilter } from "../resolve/filter";
 import * as style from "../style";
 
-const formatSeconds = (value: number) =>
-  format(new Date(1000 * value), "YYYY-MM-DD");
-
 type TreeNode<T = undefined> = { totalSeconds: number; tree: T };
 
-const formatHeading = (name: string, totalSeconds: number) =>
+const createLabel = (name: string, totalSeconds: number) =>
   `${name} - ${style.time(durationToString(totalSeconds))}`;
 
 async function displayReport(
@@ -81,8 +78,10 @@ async function displayReport(
     .sort(([a], [b]) => a.localeCompare(b))
     .forEach(
       ([clientName, { totalSeconds: clientTotal, tree: clientTree }]) => {
-        if (clientName)
-          console.log(formatHeading(style.client(clientName), clientTotal));
+        if (clientName) {
+          console.log(createLabel(style.client(clientName), clientTotal));
+          console.log();
+        }
 
         Array.from(clientTree.entries())
           .sort(([a], [b]) => a.localeCompare(b))
@@ -92,16 +91,24 @@ async function displayReport(
               { totalSeconds: projectTotal, tree: projectTree },
             ]) => {
               console.log(
-                formatHeading(style.project(projectName), projectTotal)
+                createLabel(
+                  `${clientName ? "  " : ""}${style.project(projectName)}`,
+                  projectTotal
+                )
               );
 
               Array.from(projectTree.entries())
                 .sort(([a], [b]) => a.localeCompare(b))
                 .forEach(([tag, { totalSeconds: tagTotal }]) => {
                   console.log(
-                    formatHeading(`  ${style.tag(`#${tag}`)}`, tagTotal)
+                    createLabel(
+                      `${clientName ? "  " : ""}  ${style.tag(`#${tag}`)}`,
+                      tagTotal
+                    )
                   );
                 });
+
+              console.log();
             }
           );
 

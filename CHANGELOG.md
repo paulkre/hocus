@@ -10,6 +10,7 @@
 ### Changed
 
 - Flag `-p, --project` exposed to allow querying sessions by project
+- Output formatting of `hocus report` improved
 
 # [2.0.3] - 2021-01-31
 
