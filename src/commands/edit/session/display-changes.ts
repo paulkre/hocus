@@ -18,13 +18,13 @@ export function displayChanges(session: Session, editedSession: Session) {
   if (session.startSeconds !== editedSession.startSeconds)
     changes.set("Start-Date", [
       dateToInputDefault(session.start),
-      style.date(dateToInputDefault(editedSession.start)),
+      style.time(dateToInputDefault(editedSession.start)),
     ]);
 
   if (session.endSeconds !== editedSession.endSeconds)
     changes.set("End-Date", [
       dateToInputDefault(session.end),
-      style.date(dateToInputDefault(editedSession.end)),
+      style.time(dateToInputDefault(editedSession.end)),
     ]);
 
   const tagsA = session.tags;
