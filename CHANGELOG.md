@@ -1,5 +1,11 @@
 # Changelog
 
+# [2.0.3] - 2021-01-31
+
+### Changed
+
+- Support for add sessions with a single command without being asked for tags
+
 ## [2.0.2] - 2021-01-31
 
 ### Changed
