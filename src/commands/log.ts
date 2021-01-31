@@ -13,71 +13,25 @@ import columnify from "columnify";
 import { EOL } from "os";
 import { outputText } from "../output/text";
 import * as style from "../style";
+import { wrapCommandWithFilterOptions, FilterOptions } from "../input/fliter";
+import { resolveFilter } from "../resolve/filter";
 
 const dateToDayNum = (date: Date) => Math.floor(date.getTime() / 86_400_000);
 
-type Options = {
-  from?: string;
-  to?: string;
-  first?: string;
-  last?: string;
-  tags?: string[];
-};
-
 export function createLogCommand() {
-  return createCommand("log")
-    .option(
-      "-f, --from <from>",
-      `The ${style.bold(
-        "date"
-      )} from which the output should start including data`
-    )
-    .option(
-      "-t, --to <to>",
-      `The ${style.bold("date")} at which the output should stop including data`
-    )
-    .option(
-      "--first <first>",
-      `The number of ${style.bold(
-        "sessions"
-      )} to include from the beginning of the selection`
-    )
-    .option(
-      "--last <last>",
-      `The number of ${style.bold(
-        "sessions"
-      )} to include from the end of the selection`
-    )
-    .option(
-      "-T, --tags <tags...>",
-      `The ${style.bold("tags")} every logged ${style.bold(
-        "session"
-      )} will have`
-    )
+  return wrapCommandWithFilterOptions(createCommand("log"))
     .description(
       `Display each recorded ${style.bold("session")} in the given timespan`
     )
-    .action(async (options: Options) => {
-      const filterParseResult = parseFilter({
-        ...options,
-        tags: options.tags ? options.tags.join(" ") : "",
-      });
-      if (filterParseResult.err) {
-        logError(filterParseResult.val);
+    .action(async (options: FilterOptions) => {
+      const resolveResult = await resolveFilter(options);
+      if (resolveResult.err) {
+        logError(resolveResult.val);
         return;
       }
+      const sessions = resolveResult.val;
 
-      const queryResult = await querySessions(filterParseResult.val);
-      if (queryResult.err) {
-        logError(queryResult.val);
-        return;
-      }
-      const sessions = queryResult.val;
-
-      if (!sessions.length) {
-        console.log("No data found.");
-        return;
-      }
+      if (!sessions) return;
 
       const sessionsInDays = new Map<Date, Session[]>();
 

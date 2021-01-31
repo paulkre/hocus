@@ -12,6 +12,7 @@ import {
 } from "./timespan";
 import { dateIDToDate } from "../../../entities/session";
 import { bold } from "../../../style";
+import { getProjectData, ProjectData } from "../../projects/data";
 
 export type Filter = {
   project?: string;
@@ -19,6 +20,7 @@ export type Filter = {
   first?: number;
   last?: number;
   tags?: string[];
+  client?: string;
 };
 
 function filterDataByTags(data: SessionData[], tags: string[]) {
@@ -26,6 +28,15 @@ function filterDataByTags(data: SessionData[], tags: string[]) {
     if (!session.tags) return false;
     for (const tag of session.tags) if (tags.includes(tag)) return true;
     return false;
+  });
+}
+
+async function filterDataByClient(data: SessionData[], client: string) {
+  const projectData = (await getProjectData()).unwrapOr<ProjectData[]>([]);
+
+  return data.filter((data) => {
+    const project = projectData.find(({ name }) => name === data.project);
+    return project && project.client === client;
   });
 }
 
@@ -50,6 +61,7 @@ export async function querySessionData({
   first,
   last,
   tags,
+  client,
 }: Filter): Promise<Result<SessionData[], string>> {
   let filenames = getSessionFilenames();
   if (!filenames.length) return Ok([]);
@@ -80,6 +92,8 @@ export async function querySessionData({
     sessionData = sessionData.filter((session) => session.project === project);
 
   if (tags && tags.length) sessionData = filterDataByTags(sessionData, tags);
+
+  if (client) sessionData = await filterDataByClient(sessionData, client);
 
   if (first || last) {
     let slicedData: SessionData[] = [];
