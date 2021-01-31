@@ -2,10 +2,14 @@
 
 ## [Unreleased]
 
+### Added
+
+- List view for `hocus log` is now the default
+- Introduction of `-a, --all` flag to override default timespan settings
+
 ### Changed
 
 - Flag `-p, --project` exposed to allow querying sessions by project
-- Introduction of `-a, --all` flag to override default timespan settings
 
 # [2.0.3] - 2021-01-31
 
