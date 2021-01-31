@@ -1,7 +1,7 @@
 {
   "name": "hocus",
   "description": "The ultimate time tracking tool for coders and productivity nerds",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "author": "Paul Kretschel @paulkre",
   "bin": {
     "hocus": "./lib/hocus.js"
