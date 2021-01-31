@@ -131,14 +131,14 @@ export function createStartCommand() {
         return;
       }
 
-      const resolveResult = await resolveProject(projectName);
-      if (resolveResult.err) {
-        logError(resolveResult.val);
+      const resolveProjectResult = await resolveProject(projectName);
+      if (resolveProjectResult.err) {
+        logError(resolveProjectResult.val);
         return;
       }
 
       const startResult = await startSession(
-        resolveResult.val,
+        resolveProjectResult.val,
         options.tags && parseTags(options.tags),
         resolveStartResult.val
       );

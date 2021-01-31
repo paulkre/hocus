@@ -2,6 +2,7 @@ import { createCommand } from "../command";
 import * as style from "../style";
 
 export type FilterOptions = {
+  project?: string;
   from?: string;
   to?: string;
   first?: string;
@@ -14,6 +15,12 @@ export function wrapCommandWithFilterOptions(
   command: ReturnType<typeof createCommand>
 ) {
   return command
+    .option(
+      "-p, --project <project>",
+      `The ${style.bold("project")} every included ${style.bold(
+        "session"
+      )} must have`
+    )
     .option(
       "-f, --from <from>",
       `The ${style.bold(

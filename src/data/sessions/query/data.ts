@@ -10,13 +10,18 @@ import {
   filterDataByTimespan,
   Timespan,
 } from "./timespan";
+import { Project } from "../../../entities/project";
 import { dateIDToDate } from "../../../entities/session";
 import { bold } from "../../../style";
-import { getProjectData, ProjectData } from "../../projects/data";
+import {
+  findProjectData,
+  getProjectData,
+  ProjectData,
+} from "../../projects/data";
 
 export type Filter = {
-  [key: string]: string | string[] | Timespan | number | undefined;
-  project?: string;
+  [key: string]: string | string[] | Timespan | number | Project | undefined;
+  project?: Project;
   timespan?: Timespan;
   first?: number;
   last?: number;
@@ -41,6 +46,31 @@ async function filterDataByClient(data: SessionData[], client: string) {
   });
 }
 
+async function adjustTimespanToProject(
+  project: Project,
+  timespan?: Timespan
+): Promise<Result<Timespan | undefined, string>> {
+  const findResult = await findProjectData(project.name);
+  if (findResult.err) return findResult;
+  const projectData = findResult.val;
+  if (!projectData || !projectData.sessions) return Ok(timespan);
+
+  const [projectFrom, projectTo] = projectData.sessions.timespan.map(
+    (seconds) => 1000 * seconds
+  );
+  return Ok(
+    timespan
+      ? {
+          from: new Date(Math.max(timespan.from.getTime(), projectFrom)),
+          to: new Date(Math.max(timespan.to.getTime(), projectTo)),
+        }
+      : {
+          from: new Date(projectFrom),
+          to: new Date(projectTo),
+        }
+  );
+}
+
 async function loadDataOfFirstFew(
   filenames: string[],
   first: number
@@ -59,7 +89,7 @@ async function loadDataOfFirstFew(
 export async function querySessionData(
   filter: Filter
 ): Promise<Result<SessionData[], string>> {
-  const { project, timespan, first, last, tags, client } = filter;
+  let { project, timespan, first, last, tags, client } = filter;
 
   let filenames = getSessionFilenames();
   if (!filenames.length) return Ok([]);
@@ -79,6 +109,12 @@ export async function querySessionData(
     return result.ok ? Ok(result.val.slice(-last)) : result;
   }
 
+  if (project) {
+    const adjustResult = await adjustTimespanToProject(project, timespan);
+    if (adjustResult.err) return adjustResult;
+    timespan = adjustResult.val;
+  }
+
   if (timespan) filenames = filterFilenamesByTimespan(filenames, timespan);
 
   const loadResult = Result.all(
@@ -93,7 +129,9 @@ export async function querySessionData(
   if (timespan) sessionData = filterDataByTimespan(sessionData, timespan);
 
   if (project)
-    sessionData = sessionData.filter((session) => session.project === project);
+    sessionData = sessionData.filter(
+      (session) => session.project === project!.name
+    );
 
   if (tags && tags.length) sessionData = filterDataByTags(sessionData, tags);
 

@@ -75,7 +75,7 @@ export async function getSessionsForProject(
   return findResult.val && findResult.val.sessions
     ? querySessions({
         ...filter,
-        project: project.name,
+        project,
         timespan: resolveTimespan(findResult.val.sessions.timespan),
       })
     : Ok([]);
@@ -93,7 +93,7 @@ export async function handleRemovedSessions(
     return Err("Failed to remove sessions from non-existent project.");
 
   const queryResult = await querySessionData({
-    project: project.name,
+    project,
     timespan: resolveTimespan(data.sessions.timespan),
   });
   if (queryResult.err) return queryResult;
@@ -129,7 +129,7 @@ export async function handleModifiedSession(
     return Err("Failed to update sessions of non-existent project.");
 
   const queryResult = await querySessionData({
-    project: data.name,
+    project: session.project,
     timespan: {
       from: new Date(
         1000 * Math.min(data.sessions.timespan[0], session.startSeconds)

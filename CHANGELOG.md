@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- Flag `-p, --project` exposed to allow querying sessions by project
+
 # [2.0.3] - 2021-01-31
 
 ### Changed

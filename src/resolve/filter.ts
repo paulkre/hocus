@@ -7,7 +7,7 @@ import { querySessions } from "../data/sessions";
 export async function resolveFilter(
   options: FilterOptions
 ): Promise<Result<Session[] | undefined, string>> {
-  const filterParseResult = parseFilter(options);
+  const filterParseResult = await parseFilter(options);
   if (filterParseResult.err) return filterParseResult;
 
   const queryResult = await querySessions(filterParseResult.val);
