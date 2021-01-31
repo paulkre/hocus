@@ -15,6 +15,7 @@ import { bold } from "../../../style";
 import { getProjectData, ProjectData } from "../../projects/data";
 
 export type Filter = {
+  [key: string]: string | string[] | Timespan | number | undefined;
   project?: string;
   timespan?: Timespan;
   first?: number;
@@ -55,22 +56,25 @@ async function loadDataOfFirstFew(
   return Ok(data);
 }
 
-export async function querySessionData({
-  project,
-  timespan,
-  first,
-  last,
-  tags,
-  client,
-}: Filter): Promise<Result<SessionData[], string>> {
+export async function querySessionData(
+  filter: Filter
+): Promise<Result<SessionData[], string>> {
+  const { project, timespan, first, last, tags, client } = filter;
+
   let filenames = getSessionFilenames();
   if (!filenames.length) return Ok([]);
 
-  if (first && !last && !timespan && !project) {
+  if (
+    first &&
+    Object.keys(filter).every((key) => key === "first" || !filter[key])
+  ) {
     const result = await loadDataOfFirstFew(filenames, first);
     return result.ok ? Ok(result.val.slice(0, first)) : result;
   }
-  if (last && !first && !timespan && !project) {
+  if (
+    last &&
+    Object.keys(filter).every((key) => key === "last" || !filter[key])
+  ) {
     const result = await loadDataOfFirstFew(filenames.reverse(), last);
     return result.ok ? Ok(result.val.slice(-last)) : result;
   }
