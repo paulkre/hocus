@@ -52,7 +52,7 @@
   "scripts": {
     "start": "ts-node --files src/hocus.ts",
     "build": "rimraf lib && tsc",
-    "publish": "yarn build && yarn publish"
+    "publish": "yarn build"
   },
   "types": "lib/index.d.ts"
 }
