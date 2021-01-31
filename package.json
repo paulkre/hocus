@@ -51,8 +51,7 @@
   "repository": "paulkre/hocus",
   "scripts": {
     "start": "ts-node --files src/hocus.ts",
-    "build": "rimraf lib && tsc",
-    "publish": "yarn build"
+    "build": "rimraf lib && tsc"
   },
   "types": "lib/index.d.ts"
 }
