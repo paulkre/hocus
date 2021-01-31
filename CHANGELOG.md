@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.0.2] - 2021-01-31
+
+### Changed
+
+- [2.0.1] had to be republished because it was not published correctly
+
 ## [2.0.1] - 2021-01-31
 
 ### Changed
