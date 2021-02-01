@@ -57,7 +57,7 @@ export async function startSession(
   if (!start) start = new Date();
   console.log(
     `Starting session for project ${style.project(project.name)}${
-      tags ? ` with tags ${humanizeTags(tags)}` : ""
+      tags ? `, tagged with ${humanizeTags(tags)},` : ""
     } at ${style.time(dateToTimeString(start))}.`
   );
   await storeState({ currentSession: { project, start, tags } });

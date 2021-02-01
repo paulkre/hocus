@@ -1,6 +1,11 @@
 import { createCommand } from "../command";
 import { loadState } from "../data/state";
-import { getRelativeTime, logError } from "../utils";
+import {
+  dateToTimeString,
+  getRelativeTime,
+  humanizeTags,
+  logError,
+} from "../utils";
 import * as style from "../style";
 
 export function createStatusCommand() {
@@ -19,12 +24,14 @@ export function createStatusCommand() {
         return;
       }
 
-      const { project, start } = currentSession;
+      const { project, start, tags } = currentSession;
 
       console.log(
-        `Session for project ${style.project(
-          project.name
-        )} started ${getRelativeTime(start)}.`
+        `Session for project ${style.project(project.name)}${
+          tags ? `, tagged with ${humanizeTags(tags)},` : ""
+        } started ${getRelativeTime(start)} (${style.bold(
+          dateToTimeString(start)
+        )}).`
       );
     });
 }

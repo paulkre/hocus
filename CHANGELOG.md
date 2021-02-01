@@ -1,6 +1,14 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- Wording of command line output changed
+
 ## [2.2.1] - 2021-01-31
+
+### Changed
 
 - Log output formatting fixed
 
