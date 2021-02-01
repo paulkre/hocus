@@ -1,13 +1,13 @@
 import columnify from "columnify";
 import { Session } from "../../entities/session";
-import { dateToTimeString, durationToString } from "../../utils";
+import { dateToTimeString, durationToString, limitString } from "../../utils";
 import * as style from "../../style";
 import { EOL } from "os";
 
 export function sessionsToList(sessions: Session[]): string {
   let output = "";
   sessions.forEach(
-    ({ id, project, start, end, startSeconds, endSeconds, notes }, i) => {
+    ({ id, project, start, end, startSeconds, endSeconds, tags, notes }, i) => {
       const isLastSession = i === sessions.length - 1;
 
       output += columnify(
@@ -22,6 +22,14 @@ export function sessionsToList(sessions: Session[]): string {
             : undefined,
           { label: "Start:", value: style.time(dateToTimeString(start)) },
           { label: "End:", value: style.time(dateToTimeString(end)) },
+          tags
+            ? {
+                label: "Tags:",
+                value: `[${tags
+                  .map((tag) => style.tag(limitString(tag, 10)))
+                  .join(", ")}]`,
+              }
+            : undefined,
           {
             label: "Duration:",
             value: style.bold(durationToString(endSeconds - startSeconds)),

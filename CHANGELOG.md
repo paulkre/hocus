@@ -5,6 +5,7 @@
 ### Changed
 
 - Wording of command line output changed
+- Tags are now displayed in `hocus log`
 
 ## [2.2.1] - 2021-01-31
 
@@ -30,7 +31,7 @@
 - Flag `-p, --project` exposed to allow querying sessions by project
 - Output formatting of `hocus report` improved
 
-# [2.0.3] - 2021-01-31
+## [2.0.3] - 2021-01-31
 
 ### Changed
 
