@@ -9,9 +9,10 @@ export function durationToString(seconds: number) {
   const minutes = Math.floor(seconds / 60);
   seconds -= 60 * minutes;
 
-  return `${hours ? `${hours}h ` : ""}${
-    minutes ? `${minutes}m ` : ""
-  }${seconds}s`;
+  if (!hours && !minutes && !seconds) return "0s";
+  return `${hours ? `${hours}h ` : ""}${minutes ? `${minutes}m ` : ""}${
+    seconds ? `${seconds}s` : ""
+  }`;
 }
 
 export function getRelativeTime(date: Date) {

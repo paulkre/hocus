@@ -20,7 +20,7 @@ export async function removeSession(
   const deleteResult = await deleteSession(session);
   if (deleteResult.err) return deleteResult;
 
-  console.log(`Session ${style.bold(session.id)} was removed successfully.`);
+  console.log(`Session ${style.session(session.id)} was removed successfully.`);
 
   return Ok(undefined);
 }

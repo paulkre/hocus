@@ -49,9 +49,7 @@ export function createRemoveProjectCommand() {
 
       await deleteProject(project);
 
-      console.log(
-        `Project ${style.bold(project.name)} was removed successfully.`
-      );
+      console.log(`${style.project(project.name)} was removed successfully.`);
       if (sessions.length)
         console.log(
           `${style.bold(sessions.length)} session${
