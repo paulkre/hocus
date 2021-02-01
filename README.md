@@ -1,16 +1,8 @@
 # hocus
 
-> :warning: **Caution:** This project is still in the early stages of development. Use at own risk.
-
-The ultimate time tracking tool for coders and productivity nerds.
+A powerful time tracking and note taking command line tool. The project was inspired by [Watson](https://github.com/TailorDev/Watson) and tries to extend its feature set.
 
 ## Installation
-
-```bash
-yarn global add hocus
-```
-
-or
 
 ```bash
 npm install --global hocus
