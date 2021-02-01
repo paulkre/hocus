@@ -32,25 +32,31 @@ export function createRemoveProjectCommand() {
       }
       const sessions = queryResult.val;
 
-      const { confirmed } = await prompt<{ confirmed: boolean }>([
-        {
-          name: "confirmed",
-          type: "confirm",
-          message: `Permanently remove ${sessions.length} session${
-            sessions.length > 1 ? "s" : ""
-          }?`,
-          default: false,
-        },
-      ]);
-      if (!confirmed) return;
-      console.log();
+      if (sessions.length) {
+        const { confirmed } = await prompt<{ confirmed: boolean }>([
+          {
+            name: "confirmed",
+            type: "confirm",
+            message: `Permanently remove ${sessions.length} session${
+              sessions.length > 1 ? "s" : ""
+            }?`,
+            default: false,
+          },
+        ]);
+        if (!confirmed) return;
+        console.log();
+      }
 
       await deleteProject(project);
 
       console.log(
-        `Removed ${style.bold(sessions.length)} session${
-          sessions.length > 1 ? "s" : ""
-        } of project ${style.project(projectName)}.`
+        `Project ${style.bold(project.name)} was removed successfully.`
       );
+      if (sessions.length)
+        console.log(
+          `${style.bold(sessions.length)} session${
+            sessions.length > 1 ? "s were" : " was"
+          } removed in the process.`
+        );
     });
 }
