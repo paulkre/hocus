@@ -1,6 +1,6 @@
 import columnify from "columnify";
 import { Session } from "../../entities/session";
-import { dateToTimeString, durationToString, limitString } from "../../utils";
+import { dateToTimeString, durationToString } from "../../utils";
 import * as style from "../../style";
 import { EOL } from "os";
 

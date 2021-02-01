@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- More options to modify the output of `hocus projects` (added flags `-d, --durations` and `-c, --client`)
+
 ### Changed
 
 - Wording of command line output changed
