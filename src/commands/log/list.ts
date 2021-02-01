@@ -25,9 +25,7 @@ export function sessionsToList(sessions: Session[]): string {
           tags
             ? {
                 label: "Tags:",
-                value: `[${tags
-                  .map((tag) => style.tag(limitString(tag, 10)))
-                  .join(", ")}]`,
+                value: tags.map((tag) => style.tag(tag)).join(", "),
               }
             : undefined,
           {
