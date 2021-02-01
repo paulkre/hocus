@@ -10,6 +10,7 @@
 
 - Wording of command line output changed
 - Tags are now displayed in `hocus log`
+- Report output formatting improved
 
 ## [2.2.1] - 2021-01-31
 

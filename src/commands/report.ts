@@ -1,15 +1,15 @@
 import { Result, Ok } from "ts-results";
-import { format } from "date-and-time";
 import { createCommand } from "../command";
 import { dateToDayString, durationToString, logError } from "../utils";
 import { wrapCommandWithFilterOptions, FilterOptions } from "../input/fliter";
 import { resolveFilter } from "../resolve/filter";
 import * as style from "../style";
+import { EOL } from "os";
+import { outputText } from "../output/text";
+import columnify from "columnify";
 
 type TreeNode<T = undefined> = { totalSeconds: number; tree: T };
-
-const createLabel = (name: string, totalSeconds: number) =>
-  `${name} - ${style.time(durationToString(totalSeconds))}`;
+type TableRow = { label: string; value: string };
 
 async function displayReport(
   options: FilterOptions
@@ -67,20 +67,26 @@ async function displayReport(
       });
   });
 
-  console.log(
+  let text =
     `${style.date(dateToDayString(sessions[0].start))} -> ${style.date(
       dateToDayString(sessions[sessions.length - 1].end)
-    )}`
-  );
-  console.log();
+    )}` +
+    EOL +
+    EOL;
+
+  const rows: TableRow[] = [];
+  const emptyRow: TableRow = { label: "", value: "" };
 
   Array.from(root.tree.entries())
     .sort(([a], [b]) => a.localeCompare(b))
     .forEach(
       ([clientName, { totalSeconds: clientTotal, tree: clientTree }]) => {
         if (clientName) {
-          console.log(createLabel(style.client(clientName), clientTotal));
-          console.log();
+          rows.push({
+            label: style.client(clientName),
+            value: style.time(durationToString(clientTotal)),
+          });
+          rows.push(emptyRow);
         }
 
         Array.from(clientTree.entries())
@@ -90,33 +96,37 @@ async function displayReport(
               projectName,
               { totalSeconds: projectTotal, tree: projectTree },
             ]) => {
-              console.log(
-                createLabel(
-                  `${clientName ? "  " : ""}${style.project(projectName)}`,
-                  projectTotal
-                )
-              );
+              rows.push({
+                label: style.project(projectName),
+                value: style.time(durationToString(projectTotal)),
+              });
 
               Array.from(projectTree.entries())
                 .sort(([a], [b]) => a.localeCompare(b))
                 .forEach(([tag, { totalSeconds: tagTotal }]) => {
-                  console.log(
-                    createLabel(
-                      `${clientName ? "  " : ""}  ${style.tag(`#${tag}`)}`,
-                      tagTotal
-                    )
-                  );
+                  rows.push({
+                    label: style.tag(`#${tag}`),
+                    value: style.light(durationToString(tagTotal)),
+                  });
                 });
 
-              console.log();
+              rows.push(emptyRow);
             }
           );
 
-        console.log();
+        rows.push(emptyRow);
       }
     );
 
-  console.log(`Total: ${style.time(durationToString(root.totalSeconds))}`);
+  text +=
+    columnify(rows, {
+      showHeaders: false,
+      columnSplitter: "  ",
+    }) + EOL;
+
+  text += `Total: ${style.time(durationToString(root.totalSeconds))}`;
+
+  outputText(text);
 
   return Ok(undefined);
 }

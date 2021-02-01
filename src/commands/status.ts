@@ -29,7 +29,7 @@ export function createStatusCommand() {
       console.log(
         `Session for project ${style.project(project.name)}${
           tags ? `, tagged with ${humanizeTags(tags)},` : ""
-        } started ${getRelativeTime(start)} (${style.bold(
+        } started ${getRelativeTime(start)} (at ${style.bold(
           dateToTimeString(start)
         )}).`
       );
