@@ -38,7 +38,8 @@
   },
   "files": [
     "lib/",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "homepage": "https://github.com/paulkre/hocus",
   "keywords": [
