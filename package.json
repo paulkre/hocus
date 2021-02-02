@@ -1,7 +1,7 @@
 {
   "name": "hocus",
   "description": "A powerful time tracking and note taking command line tool",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "author": "Paul Kretschel @paulkre",
   "bin": {
     "hocus": "./lib/hocus.js"
