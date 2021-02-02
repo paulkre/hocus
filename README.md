@@ -2,6 +2,8 @@
 
 A powerful time tracking and note taking command line tool. The project was inspired by [Watson](https://github.com/TailorDev/Watson) and tries to extend its feature set.
 
+![Demo](https://github.com/paulkre/hocus/blob/main/docs/demo.gif)
+
 ## Installation
 
 ```bash

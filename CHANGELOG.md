@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- README now contains an animated gif demoing the software
+
 ## [2.3.1] - 2021-02-02
 
 ### Changed
