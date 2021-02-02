@@ -1,6 +1,6 @@
 {
   "name": "hocus",
-  "description": "The ultimate time tracking tool for coders and productivity nerds",
+  "description": "A powerful time tracking and note taking command line tool",
   "version": "2.3.0",
   "author": "Paul Kretschel @paulkre",
   "bin": {
@@ -8,7 +8,6 @@
   },
   "bugs": "https://github.com/paulkre/hocus/issues",
   "dependencies": {
-    "@types/date-and-time": "^0.13.0",
     "chalk": "^4.1.0",
     "chrono-node": "^2.1.11",
     "columnify": "^1.5.4",
@@ -24,6 +23,7 @@
   },
   "devDependencies": {
     "@types/columnify": "^1.5.0",
+    "@types/date-and-time": "^0.13.0",
     "@types/inquirer": "^7.3.1",
     "@types/is-valid-path": "^0.1.0",
     "@types/mkdirp": "^1.0.1",
@@ -44,7 +44,9 @@
   "keywords": [
     "time tracking",
     "command line tool",
-    "cli"
+    "cli",
+    "note taking",
+    "productivity"
   ],
   "license": "MIT",
   "main": "lib/index.js",
