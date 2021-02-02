@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [2.3.1] - 2021-02-02
 
 ### Changed
 
@@ -116,7 +116,8 @@
 
 - Initial release
 
-[Unreleased]: https://github.com/paulkre/hocus/compare/v2.3.0...HEAD
+[Unreleased]: https://github.com/paulkre/hocus/compare/v2.3.1...HEAD
+[2.3.1]: https://github.com/paulkre/hocus/compare/v2.3.0...v2.3.1
 [2.3.0]: https://github.com/paulkre/hocus/compare/v2.2.1...v2.3.0
 [2.2.1]: https://github.com/paulkre/hocus/compare/v2.2.0...v2.2.1
 [2.2.0]: https://github.com/paulkre/hocus/compare/v2.1.0...v2.2.0
