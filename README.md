@@ -6,6 +6,19 @@ A powerful time tracking and note taking command line tool. The project was insp
 
 ## Installation
 
+### MacOS
+
+Hocus is available for [Hombrew](https://brew.sh/):
+
+```bash
+brew tap paulkre/hocus
+brew install hocus
+```
+
+### Other systems
+
+To install Hocus on Linux or Windows you have to first install [Node.js](https://nodejs.org/en/download/) and then run:
+
 ```bash
 npm install --global hocus
 ```
