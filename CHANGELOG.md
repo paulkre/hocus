@@ -2,9 +2,10 @@
 
 ## [Unreleased]
 
-### Changed
+### Added
 
 - README now contains an animated gif demoing the software
+- MIT license
 
 ## [2.3.1] - 2021-02-02
 
