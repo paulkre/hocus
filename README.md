@@ -23,6 +23,14 @@ To install Hocus on Linux or Windows you have to first install [Node.js](https:/
 npm install --global hocus
 ```
 
+## Configuration
+
+Hocus is completely file based – no database or API is being used. The default application's directory is `~/.hocus`. Just push `~/.hocus/data/` to a remote repository to back up all of your recorded data. You can change the default application's directory by creating a configuration file named `~/.hocusrc` with the following contents:
+
+```json
+{ "appDirectory": "/your/preferred/directory" }
+```
+
 ## Usage
 
 The command `hocus help` lists the available commands and `hocus help <command>` shows more details for an individual command.

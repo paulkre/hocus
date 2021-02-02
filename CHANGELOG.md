@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- Explained application's configuration in README
+
 ## [2.4.0] - 2021-02-02
 
 ### Added
