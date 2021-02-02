@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- Incorrect querying of sessions at end of month is now fixed
+
 ## [2.3.0] - 2021-02-01
 
 ### Added

@@ -73,17 +73,19 @@ async function adjustTimespanToProject(
 
 async function loadDataOfFirstFew(
   filenames: string[],
-  first: number
+  first: number,
+  reversed?: boolean
 ): Promise<Result<SessionData[], string>> {
+  if (reversed) filenames = filenames.reverse();
   let data: SessionData[] = [];
   let i = 0;
   do {
     const result = await getSessionsFile(filenames[i]).load();
     i++;
     if (result.err) return result;
-    data = data.concat(result.val);
+    data = reversed ? result.val.concat(data) : data.concat(result.val);
   } while (data.length < first && i < filenames.length);
-  return Ok(data);
+  return Ok(reversed ? data.slice(-first) : data.slice(0, first));
 }
 
 export async function querySessionData(
@@ -97,17 +99,13 @@ export async function querySessionData(
   if (
     first &&
     Object.keys(filter).every((key) => key === "first" || !filter[key])
-  ) {
-    const result = await loadDataOfFirstFew(filenames, first);
-    return result.ok ? Ok(result.val.slice(0, first)) : result;
-  }
+  )
+    return loadDataOfFirstFew(filenames, first);
   if (
     last &&
     Object.keys(filter).every((key) => key === "last" || !filter[key])
-  ) {
-    const result = await loadDataOfFirstFew(filenames.reverse(), last);
-    return result.ok ? Ok(result.val.slice(-last)) : result;
-  }
+  )
+    return loadDataOfFirstFew(filenames, last, true);
 
   if (project) {
     const adjustResult = await adjustTimespanToProject(project, timespan);
